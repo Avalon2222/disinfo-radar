@@ -6,10 +6,20 @@
 > menjadi topik dengan TF-IDF + NMF: topik apa yang naik, kata apa yang sedang ramai, format hoaks yang berubah,
 > dan hoaks lama mana yang paling mirip dengan klaim baru. Python, scikit-learn, Plotly, Streamlit.
 
-*Every lie leaves a fingerprint. A radar for Indonesian disinformation, built on 14,688 public fact-check articles:
-simple NLP (TF-IDF + NMF, with K-Means as a comparison) sorts the hoaxes into topics, tracks which topics and words are rising, shows how the
-format shifts from chain messages to scam links, and finds the closest debunked claim for any new one. Python,
-scikit-learn, Plotly and Streamlit.*
+## 🇬🇧 In English
+
+**Every lie leaves a fingerprint.** A radar for Indonesian disinformation, built on 14,688 public fact-check articles (2014–2026). Classic NLP sorts the hoaxes into topics, tracks which topics and words are rising, shows how the format shifts from chain messages to scam links, and finds the closest debunked claim for any new one.
+
+- **Cluster** hoaxes into topics with TF-IDF + NMF, with K-Means as a comparison.
+- **Track** rising and fading keywords, normalized per 1,000 headlines.
+- **Paste** any claim and get the most similar existing fact-checks (cosine similarity).
+- **Map** the newest articles from the live RSS feed to their nearest topic.
+
+**Built with:** Python, scikit-learn, SciPy, pandas, Plotly, Streamlit  
+**Data:** Turnbackhoax.id fact-check archive by Mafindo (public listing pages)  
+**Engineering:** pytest suite with CI on GitHub Actions and a scheduled workflow that collects new articles
+
+*The rest of this README is in Indonesian.*
 
 **🚀 Coba langsung di browser:** [hoax-radar.streamlit.app](https://hoax-radar.streamlit.app)
 
