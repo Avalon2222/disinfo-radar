@@ -1,5 +1,7 @@
 # 📡 Disinfo Radar
 
+[![tests](https://github.com/Avalon2222/disinfo-radar/actions/workflows/tests.yml/badge.svg)](https://github.com/Avalon2222/disinfo-radar/actions/workflows/tests.yml) [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://hoax-radar.streamlit.app)
+
 > Pola hoaks Indonesia dari **14.688 artikel cek fakta** Turnbackhoax (Mafindo), 2014–2026, dikelompokkan otomatis
 > menjadi topik dengan TF-IDF + NMF: topik apa yang naik, kata apa yang sedang ramai, format hoaks yang berubah,
 > dan hoaks lama mana yang paling mirip dengan klaim baru. Python, scikit-learn, Plotly, Streamlit.
