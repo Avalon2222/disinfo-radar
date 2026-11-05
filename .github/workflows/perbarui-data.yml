@@ -1,0 +1,29 @@
+name: Perbarui arsip cek fakta
+
+on:
+  schedule:
+    - cron: "17 21 * * 0"   # setiap Minggu 21:17 UTC (Senin 04:17 WIB)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  perbarui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pandas requests
+      - name: Ambil artikel baru dari halaman daftar Turnbackhoax
+        run: python scripts/kumpulkan_data.py
+      - name: Commit bila ada perubahan
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/hoaks_turnbackhoax.csv
+          git diff --cached --quiet && echo "Tidak ada artikel baru" && exit 0
+          git commit -m "Perbarui arsip cek fakta mingguan"
+          git push
