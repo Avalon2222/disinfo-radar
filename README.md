@@ -9,7 +9,7 @@ simple NLP (TF-IDF + NMF, with K-Means as a comparison) sorts the hoaxes into to
 format shifts from chain messages to scam links, and finds the closest debunked claim for any new one. Python,
 scikit-learn, Plotly and Streamlit.*
 
-**🚀 Coba langsung di browser:** [disinfo-radar.streamlit.app](https://disinfo-radar.streamlit.app)
+**🚀 Coba langsung di browser:** [hoax-radar.streamlit.app](https://hoax-radar.streamlit.app)
 
 ![Radar](docs/screenshots/01_radar.png)
 
