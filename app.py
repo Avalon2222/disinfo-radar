@@ -432,13 +432,11 @@ with tab_cek:
     if klaim.strip():
         idx, skor = analisis.cari_mirip(model, klaim, n=n_mirip)
         k_pred = int(analisis.prediksi_klaster(model, [klaim])[0])
-        token = teks.tokenisasi(teks.buang_label(klaim))
-        dikenal = [t for t in token if t in model.vectorizer.vocabulary_]
+        dikenal = analisis.kata_dikenali(model, klaim)
         st.markdown(f"**Topik terdekat:** `{model.nama[k_pred]}` &nbsp;·&nbsp; kata yang dikenali model: "
-                    + (", ".join(f"`{t}`" for t in dikenal) if dikenal else "*(tidak ada; hasil akan acak)*"))
+                    + (", ".join(f"`{t}`" for t in dikenal) if dikenal else "*(tidak ada, jadi topiknya cuma tebakan)*"))
         hasil = df.loc[idx].copy()
         hasil["Kemiripan"] = skor
-        hasil = hasil[hasil["Kemiripan"] > 0]
         if hasil.empty:
             st.warning("Tidak ada judul di arsip yang berbagi kata dengan klaim ini. Coba kata yang lebih umum.")
         else:
