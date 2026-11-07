@@ -243,8 +243,17 @@ def cari_mirip(model: ModelTopik, klaim: str, n: int = 10) -> tuple[np.ndarray, 
     """
     Cosine similarity antara klaim dan semua judul arsip. Karena TF-IDF sudah L2-normal,
     cosine = perkalian titik. Mengembalikan (indeks baris, skor) terurut dari yang paling mirip.
+    Judul dengan skor 0 (tidak berbagi satu kata pun dengan klaim) tidak ikut dikembalikan,
+    jadi hasilnya bisa lebih sedikit dari n, atau kosong.
     """
     v = vektor_klaim(model, [klaim])
     skor = np.asarray((model.X @ v.T).todense()).ravel()
-    urut = np.argsort(skor)[::-1][:n]
+    urut = np.argsort(-skor, kind="stable")[:n]   # stable: skor seri tetap urut sesuai arsip
+    urut = urut[skor[urut] > 0]
     return urut, skor[urut]
+
+
+def kata_dikenali(model: ModelTopik, klaim: str) -> list[str]:
+    """Kata dari klaim (setelah dibersihkan dengan cara yang sama) yang ada di kosakata model."""
+    kosakata = model.vectorizer.vocabulary_
+    return [t for t in teks.bersihkan_judul(klaim).split() if t in kosakata]

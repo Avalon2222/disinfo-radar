@@ -109,3 +109,22 @@ def test_prediksi_dan_cari_mirip(df, model):
     idx, skor = analisis.cari_mirip(model, "vaksin covid chip 5G", n=3)
     assert len(idx) == 3 and skor[0] >= skor[1] >= skor[2] > 0
     assert all(df.loc[idx, "kategori"] == "Kesehatan")
+
+
+def test_cari_mirip_buang_skor_nol(df, model):
+    idx, skor = analisis.cari_mirip(model, "vaksin covid chip 5G", n=len(df))
+    assert len(idx) < len(df)                       # judul gempa tidak berbagi kata, jadi tidak ikut
+    assert (skor > 0).all()
+    assert all(df.loc[idx, "kategori"] == "Kesehatan")
+
+
+def test_cari_mirip_klaim_asing_hasil_kosong(model):
+    idx, skor = analisis.cari_mirip(model, "resep rendang padang", n=5)
+    assert len(idx) == 0 and len(skor) == 0
+    assert analisis.kata_dikenali(model, "resep rendang padang") == []
+
+
+def test_kata_dikenali_pakai_pembersih_yang_sama(model):
+    dikenal = analisis.kata_dikenali(model, "[SALAH] Vaksin COVID mengandung chip!")
+    assert "vaksin" in dikenal and "covid" in dikenal
+    assert "salah" not in dikenal                   # label di depan judul dibuang dulu
