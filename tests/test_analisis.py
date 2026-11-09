@@ -153,3 +153,28 @@ def test_vektor_klaim_membersihkan_label_dulu(model):
     v = analisis.vektor_klaim(model, ["[SALAH] Vaksin Covid Mengandung Chip", "Vaksin Covid Mengandung Chip"])
     assert v.shape[0] == 2
     assert np.allclose(v[0].toarray(), v[1].toarray())
+
+
+def _matriks_dua_topik():
+    from sklearn.feature_extraction.text import TfidfVectorizer
+
+    teks = ["vaksin covid chip"] * 4 + ["pemilu suara curang"] * 4
+    return TfidfVectorizer().fit_transform(teks)
+
+
+def test_klasterkan_deterministik_dan_pisah_topik():
+    X = _matriks_dua_topik()
+    a, b = analisis.klasterkan(X, 2), analisis.klasterkan(X, 2)
+    assert (a.labels_ == b.labels_).all()                       # seed tetap -> hasil sama
+    assert len(set(a.labels_[:4])) == 1 and a.labels_[0] != a.labels_[4]
+    assert a.cluster_centers_.shape == (2, X.shape[1])
+
+
+def test_faktorkan_bobot_tidak_negatif():
+    X = _matriks_dua_topik()
+    nmf = analisis.faktorkan(X, 2)
+    assert nmf.components_.shape == (2, X.shape[1])
+    assert (nmf.components_ >= 0).all()
+    W = nmf.transform(X)
+    assert W[:4].argmax(axis=1).tolist() == [W[0].argmax()] * 4
+    assert W[0].argmax() != W[4].argmax()
