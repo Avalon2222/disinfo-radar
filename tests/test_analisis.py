@@ -128,3 +128,28 @@ def test_kata_dikenali_pakai_pembersih_yang_sama(model):
     dikenal = analisis.kata_dikenali(model, "[SALAH] Vaksin COVID mengandung chip!")
     assert "vaksin" in dikenal and "covid" in dikenal
     assert "salah" not in dikenal                   # label di depan judul dibuang dulu
+
+
+def test_kata_kunci_klaster_urut_dan_buang_bobot_nol():
+    vec, _ = analisis.bangun_tfidf(["vaksin covid chip", "gempa tsunami bmkg"], min_df=1, max_df=1.0)
+    fitur = list(vec.get_feature_names_out())
+    komponen = np.zeros((2, len(fitur)))
+    komponen[0, fitur.index("vaksin")] = 0.9
+    komponen[0, fitur.index("chip")] = 0.4
+    komponen[1, fitur.index("gempa")] = 0.7
+    kk = analisis.kata_kunci_klaster(vec, komponen, n=5)
+    assert [k for k, _ in kk[0]] == ["vaksin", "chip"]     # terurut menurun, kata berbobot 0 dibuang
+    assert [k for k, _ in kk[1]] == ["gempa"]
+    assert all(isinstance(b, float) for _, b in kk[0])
+
+
+def test_kata_kunci_klaster_dibatasi_n(model):
+    kk = analisis.kata_kunci_klaster(model.vectorizer, np.ones((1, len(model.vectorizer.vocabulary_))), n=3)
+    assert len(kk[0]) == 3
+
+
+def test_vektor_klaim_membersihkan_label_dulu(model):
+    # Awalan label "[SALAH]" tidak boleh mengubah vektor: klaim dibersihkan dengan cara yang sama seperti arsip.
+    v = analisis.vektor_klaim(model, ["[SALAH] Vaksin Covid Mengandung Chip", "Vaksin Covid Mengandung Chip"])
+    assert v.shape[0] == 2
+    assert np.allclose(v[0].toarray(), v[1].toarray())
