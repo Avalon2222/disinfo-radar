@@ -58,7 +58,7 @@ def test_urai_rss():
     df = muat_data.urai_rss(RSS_CONTOH)
     assert len(df) == 2
     assert df.loc[0, "id"] == 37370 and df.loc[0, "kategori"] == "Politik"
-    assert df.loc[0, "tanggal"] == pd.Timestamp("2026-11-05 03:00:00")
+    assert df.loc[0, "tanggal"] == pd.Timestamp("2026-11-05 10:00:00")  # 03.00 GMT = 10.00 WIB
     assert df.loc[1, "kategori"] == ""
 
 
