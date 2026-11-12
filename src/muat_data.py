@@ -13,6 +13,7 @@ from __future__ import annotations
 import re
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from src import teks
 DIR_DATA = Path(__file__).resolve().parent.parent / "data"
 BERKAS_ARSIP = DIR_DATA / "hoaks_turnbackhoax.csv"
 URL_RSS = "https://turnbackhoax.id/feed"
+WIB = timezone(timedelta(hours=7), "WIB")
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; disinfo-radar/1.0)"}
 
 # Label di judul Turnbackhoax berubah gaya dari tahun ke tahun; disatukan ke beberapa kelompok.
@@ -97,6 +99,17 @@ class HasilRSS:
     pesan: str = ""
 
 
+def _ke_wib(waktu: datetime) -> datetime:
+    """Samakan zona waktu dengan arsip (tanggal WIB), lalu buang info zona.
+
+    pubDate RSS biasanya dalam GMT. Tanpa konversi, artikel yang terbit pukul 05.00 WIB
+    akan tercatat di tanggal sehari sebelumnya.
+    """
+    if waktu.tzinfo is None:
+        return waktu
+    return waktu.astimezone(WIB).replace(tzinfo=None)
+
+
 def urai_rss(teks_xml: str) -> pd.DataFrame:
     """Ubah XML RSS menjadi tabel id, tanggal, judul, url, kategori."""
     akar = ET.fromstring(teks_xml)
@@ -107,7 +120,7 @@ def urai_rss(teks_xml: str) -> pd.DataFrame:
         tgl = item.findtext("pubDate")
         m = re.search(r"/articles/(\d+)", url)
         try:
-            tanggal = parsedate_to_datetime(tgl).replace(tzinfo=None) if tgl else pd.NaT
+            tanggal = _ke_wib(parsedate_to_datetime(tgl)) if tgl else pd.NaT
         except (TypeError, ValueError):
             tanggal = pd.NaT
         baris.append({
