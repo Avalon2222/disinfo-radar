@@ -74,3 +74,54 @@ def test_arsip_di_repo_terbaca():
     assert df["tanggal"].min().year >= 2014 and df["tanggal"].max().year >= 2026
     assert {"Salah", "Penipuan"} <= set(df["label_kelompok"])
     assert df["teks_tfidf"].str.len().gt(0).mean() > 0.95
+
+
+class _Respons:
+    def __init__(self, teks="", status=200):
+        self.text = teks
+        self.status_code = status
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            import requests
+            raise requests.HTTPError(f"{self.status_code} Server Error")
+
+
+def test_urai_rss_tanggal_lewat_tengah_malam_wib():
+    xml = RSS_CONTOH.replace("Wed, 05 Nov 2026 03:00:00 +0000", "Wed, 05 Nov 2026 20:30:00 +0000")
+    df = muat_data.urai_rss(xml)
+    assert df.loc[0, "tanggal"] == pd.Timestamp("2026-11-06 03:30:00")
+
+
+def test_urai_rss_tanggal_rusak_dan_link_tanpa_id():
+    xml = RSS_CONTOH.replace("Wed, 05 Nov 2026 03:00:00 +0000", "bukan tanggal").replace(
+        "articles/37369-penipuan-judul-dua", "halaman-lain")
+    df = muat_data.urai_rss(xml)
+    assert pd.isna(df.loc[0, "tanggal"])
+    assert df.loc[1, "id"] == -1
+
+
+def test_ambil_rss_live(monkeypatch):
+    monkeypatch.setattr(muat_data.requests, "get", lambda *a, **k: _Respons(RSS_CONTOH))
+    hasil = muat_data.ambil_rss()
+    assert hasil.sumber == "live" and len(hasil.data) == 2 and hasil.pesan == ""
+
+
+def test_ambil_rss_kosong(monkeypatch):
+    kosong = "<rss><channel><title>x</title></channel></rss>"
+    monkeypatch.setattr(muat_data.requests, "get", lambda *a, **k: _Respons(kosong))
+    hasil = muat_data.ambil_rss()
+    assert hasil.sumber == "gagal" and hasil.pesan == "RSS kosong"
+
+
+def test_ambil_rss_xml_rusak(monkeypatch):
+    monkeypatch.setattr(muat_data.requests, "get", lambda *a, **k: _Respons("<rss><item>"))
+    hasil = muat_data.ambil_rss()
+    assert hasil.sumber == "gagal" and hasil.data.empty
+    assert list(hasil.data.columns) == ["id", "tanggal", "judul", "url", "kategori"]
+
+
+def test_ambil_rss_http_error(monkeypatch):
+    monkeypatch.setattr(muat_data.requests, "get", lambda *a, **k: _Respons(status=503))
+    hasil = muat_data.ambil_rss()
+    assert hasil.sumber == "gagal" and "503" in hasil.pesan
