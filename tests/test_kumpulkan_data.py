@@ -140,3 +140,21 @@ def test_ambil_halaman_menyerah_setelah_batas_percobaan(monkeypatch):
     monkeypatch.setattr(kd.time, "sleep", lambda _: None)
     sesi = _SesiPalsu([_Respons(500)] * 3)
     assert kd.ambil_halaman(1, sesi, percobaan=3) == [] and sesi.panggilan == 3
+
+
+def test_unduh_semua_berhenti_setelah_blok_kosong(tmp_path, monkeypatch):
+    monkeypatch.setattr(kd, "BERKAS_KELUARAN", tmp_path / "hoaks.csv")
+    monkeypatch.setattr(kd.time, "sleep", lambda _: None)
+    diminta = []
+
+    def palsu(no, sesi):
+        diminta.append(no)
+        return [_kartu(no)] if no <= 5 else []
+
+    monkeypatch.setattr(kd, "ambil_halaman", palsu)
+    hasil = kd.unduh_semua(mulai=1, utas=1)          # blok = 4 halaman per putaran
+    assert sorted(hasil["id"]) == [1, 2, 3, 4, 5]
+    assert max(diminta) == 12                        # blok 9-12 kosong, lalu berhenti
+    # Hasil sudah tersimpan per blok, jadi proses yang terputus bisa dilanjutkan.
+    tersimpan = pd.read_csv(tmp_path / "hoaks.csv")
+    assert sorted(tersimpan["id"]) == [1, 2, 3, 4, 5]
