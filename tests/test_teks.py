@@ -52,3 +52,14 @@ def test_rapikan_akhiran_kata_pendek_dibiarkan():
     # "punya" dan "hanya" bukan kata + akhiran -nya, jadi tidak boleh dipotong.
     assert teks.rapikan_akhiran("punya") == "punya"
     assert teks.rapikan_akhiran("hanya") == "hanya"
+
+
+def test_tokenisasi_parameter_stopword_dan_panjang_minimum():
+    kalimat = "Vaksin covid bikin chip di tubuh"
+    assert "di" not in teks.tokenisasi(kalimat, stopword=set(), min_panjang=3)
+    assert "di" in teks.tokenisasi(kalimat, stopword=set(), min_panjang=2)
+    assert "vaksin" not in teks.tokenisasi(kalimat, stopword={"vaksin"})
+
+
+def test_normalisasi_tanda_hubung_jadi_spasi():
+    assert teks.normalisasi("Anti-Vaksin di https://contoh.id/x!!") == "anti vaksin di"
