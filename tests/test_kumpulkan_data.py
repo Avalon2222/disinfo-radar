@@ -65,3 +65,41 @@ def test_simpan_buang_duplikat_dan_urutkan(monkeypatch, tmp_path):
     hasil = pd.read_csv(keluar)
     assert hasil["id"].tolist() == [2, 1]
     assert list(hasil.columns) == kd.KOLOM
+
+
+def _kartu(i: int) -> dict:
+    return {"id": i, "tanggal": "2026-11-01", "judul": f"[SALAH] Hoaks {i}", "label": "SALAH",
+            "kategori": "Politik", "ringkasan": "", "url": f"https://turnbackhoax.id/articles/{i}"}
+
+
+def test_muat_lama_tanpa_berkas_kembalikan_tabel_kosong(tmp_path, monkeypatch):
+    monkeypatch.setattr(kd, "BERKAS_KELUARAN", tmp_path / "tidak_ada.csv")
+    df = kd.muat_lama()
+    assert df.empty and list(df.columns) == kd.KOLOM
+
+
+def test_perbarui_berhenti_saat_halaman_sudah_dikenal(tmp_path, monkeypatch):
+    berkas = tmp_path / "hoaks.csv"
+    pd.DataFrame([_kartu(1), _kartu(2)], columns=kd.KOLOM).to_csv(berkas, index=False)
+    monkeypatch.setattr(kd, "BERKAS_KELUARAN", berkas)
+    monkeypatch.setattr(kd.time, "sleep", lambda _: None)
+    halaman = {1: [_kartu(4), _kartu(3)], 2: [_kartu(2), _kartu(1)], 3: [_kartu(0)]}
+    diminta = []
+
+    def palsu(no, sesi):
+        diminta.append(no)
+        return halaman.get(no, [])
+
+    monkeypatch.setattr(kd, "ambil_halaman", palsu)
+    hasil = kd.perbarui()
+    # Halaman 2 isinya sudah tersimpan semua, jadi halaman 3 tidak perlu diminta.
+    assert diminta == [1, 2]
+    assert sorted(hasil["id"].astype(int)) == [1, 2, 3, 4]
+
+
+def test_perbarui_berhenti_saat_halaman_kosong(tmp_path, monkeypatch):
+    monkeypatch.setattr(kd, "BERKAS_KELUARAN", tmp_path / "baru.csv")
+    monkeypatch.setattr(kd.time, "sleep", lambda _: None)
+    monkeypatch.setattr(kd, "ambil_halaman", lambda no, sesi: [_kartu(no)] if no <= 2 else [])
+    hasil = kd.perbarui(batas_halaman=10)
+    assert sorted(hasil["id"].astype(int)) == [1, 2]
