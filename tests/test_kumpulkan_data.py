@@ -103,3 +103,40 @@ def test_perbarui_berhenti_saat_halaman_kosong(tmp_path, monkeypatch):
     monkeypatch.setattr(kd, "ambil_halaman", lambda no, sesi: [_kartu(no)] if no <= 2 else [])
     hasil = kd.perbarui(batas_halaman=10)
     assert sorted(hasil["id"].astype(int)) == [1, 2]
+
+
+class _Respons:
+    def __init__(self, kode, teks=""):
+        self.status_code, self.text = kode, teks
+
+
+class _SesiPalsu:
+    def __init__(self, urutan):
+        self.urutan, self.panggilan = list(urutan), 0
+
+    def get(self, url, params, headers, timeout):
+        self.panggilan += 1
+        hasil = self.urutan.pop(0)
+        if isinstance(hasil, Exception):
+            raise hasil
+        return hasil
+
+
+def test_ambil_halaman_coba_lagi_lalu_berhasil(monkeypatch):
+    monkeypatch.setattr(kd.time, "sleep", lambda _: None)
+    sesi = _SesiPalsu([kd.requests.ConnectionError("putus"), _Respons(503), _Respons(200, KARTU)])
+    kartu = kd.ambil_halaman(3, sesi)
+    assert sesi.panggilan == 3
+    assert [k["id"] for k in kartu] == [12345]
+
+
+def test_ambil_halaman_404_langsung_berhenti(monkeypatch):
+    monkeypatch.setattr(kd.time, "sleep", lambda _: None)
+    sesi = _SesiPalsu([_Respons(404)])
+    assert kd.ambil_halaman(999, sesi) == [] and sesi.panggilan == 1
+
+
+def test_ambil_halaman_menyerah_setelah_batas_percobaan(monkeypatch):
+    monkeypatch.setattr(kd.time, "sleep", lambda _: None)
+    sesi = _SesiPalsu([_Respons(500)] * 3)
+    assert kd.ambil_halaman(1, sesi, percobaan=3) == [] and sesi.panggilan == 3
