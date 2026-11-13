@@ -38,3 +38,17 @@ def test_deteksi_format():
     assert teks.deteksi_format("[SALAH] Video Dapur MBG Dipantau WHO") == "Video"
     assert teks.deteksi_format("[SALAH] Pesan Berantai Bantuan Kuota") == "Pesan berantai"
     assert teks.deteksi_format("[SALAH] Dapur MBG Dipantau WHO") == "Teks / lainnya"
+
+
+def test_input_kosong_atau_none_tidak_error():
+    assert teks.buang_label(None) == ""
+    assert teks.normalisasi(None) == ""
+    assert teks.tokenisasi("") == []
+    assert teks.bersihkan_judul("[SALAH]") == ""
+    assert teks.deteksi_format("") == "Teks / lainnya"
+
+
+def test_rapikan_akhiran_kata_pendek_dibiarkan():
+    # "punya" dan "hanya" bukan kata + akhiran -nya, jadi tidak boleh dipotong.
+    assert teks.rapikan_akhiran("punya") == "punya"
+    assert teks.rapikan_akhiran("hanya") == "hanya"
