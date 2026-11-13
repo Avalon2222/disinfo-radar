@@ -125,3 +125,22 @@ def test_ambil_rss_http_error(monkeypatch):
     monkeypatch.setattr(muat_data.requests, "get", lambda *a, **k: _Respons(status=503))
     hasil = muat_data.ambil_rss()
     assert hasil.sumber == "gagal" and "503" in hasil.pesan
+
+
+def test_ke_wib_waktu_tanpa_zona_tidak_diubah():
+    from datetime import datetime
+
+    waktu = datetime(2026, 11, 5, 23, 30)
+    assert muat_data._ke_wib(waktu) == waktu
+
+
+def test_ke_wib_geser_tujuh_jam_dan_buang_zona():
+    from datetime import datetime, timedelta, timezone
+
+    gmt = datetime(2026, 11, 5, 20, 15, tzinfo=timezone.utc)
+    hasil = muat_data._ke_wib(gmt)
+    assert hasil.tzinfo is None
+    assert hasil == datetime(2026, 11, 6, 3, 15)
+    # Zona lain (misalnya +09:00) juga harus diseragamkan ke WIB.
+    wit = datetime(2026, 11, 6, 8, 0, tzinfo=timezone(timedelta(hours=9)))
+    assert muat_data._ke_wib(wit) == datetime(2026, 11, 6, 6, 0)
