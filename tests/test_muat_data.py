@@ -144,3 +144,13 @@ def test_ke_wib_geser_tujuh_jam_dan_buang_zona():
     # Zona lain (misalnya +09:00) juga harus diseragamkan ke WIB.
     wit = datetime(2026, 11, 6, 8, 0, tzinfo=timezone(timedelta(hours=9)))
     assert muat_data._ke_wib(wit) == datetime(2026, 11, 6, 6, 0)
+
+
+def test_siapkan_buang_baris_dengan_id_rusak():
+    df = contoh_df()
+    df["id"] = df["id"].astype(object)
+    df.loc[0, "id"] = "abc"
+    df.loc[1, "id"] = None
+    hasil = muat_data.siapkan(df)
+    assert hasil["id"].tolist() == [1]
+    assert hasil["id"].dtype.kind == "i"

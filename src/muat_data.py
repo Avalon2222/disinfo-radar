@@ -70,7 +70,9 @@ def siapkan(df: pd.DataFrame) -> pd.DataFrame:
     """Tambahkan kolom turunan yang dipakai seluruh aplikasi."""
     df = df.copy()
     df["tanggal"] = pd.to_datetime(df["tanggal"], errors="coerce")
-    df = df.dropna(subset=["tanggal", "judul"]).copy()
+    # id dipakai sebagai kunci artikel; baris tanpa id angka tidak bisa dipakai dan dibuang.
+    df["id"] = pd.to_numeric(df["id"], errors="coerce")
+    df = df.dropna(subset=["id", "tanggal", "judul"]).copy()
     # Sebagian kecil artikel tampil dengan tanggal mustahil di situs (tahun 1000, 6325, atau di masa depan); dibuang.
     batas_akhir = pd.Timestamp.today().normalize() + pd.Timedelta(days=1)
     df = df[(df["tanggal"].dt.year >= TAHUN_MIN) & (df["tanggal"] <= batas_akhir)].copy()
