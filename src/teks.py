@@ -103,14 +103,14 @@ POLA_SPASI = re.compile(r"\s+")
 
 def buang_label(judul: str) -> str:
     """'[SALAH] Vaksin Mengandung Chip' -> 'Vaksin Mengandung Chip'. Juga membuang akhiran situs."""
-    judul = POLA_LABEL.sub("", judul or "")
+    judul = POLA_LABEL.sub("", judul if isinstance(judul, str) else "")
     judul = re.sub(r"\s*[–-]\s*TurnBackHoax\.ID\s*$", "", judul, flags=re.I)
     return judul.strip().strip('"“”\'')
 
 
 def normalisasi(teks: str) -> str:
     """Huruf kecil, tanpa URL, angka, dan tanda baca. Tanda kutip ganda yang aneh ikut hilang."""
-    teks = (teks or "").lower()
+    teks = (teks if isinstance(teks, str) else "").lower()
     teks = POLA_URL.sub(" ", teks)
     teks = teks.replace("-", " ")
     teks = POLA_NON_HURUF.sub(" ", teks)

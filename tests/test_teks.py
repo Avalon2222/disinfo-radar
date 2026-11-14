@@ -68,3 +68,12 @@ def test_normalisasi_tanda_hubung_jadi_spasi():
 def test_stopword_berakhiran_nya_tidak_terpotong_jadi_kata_aneh():
     hasil = teks.tokenisasi("Warga bertanya soal bantuan, ditanya polisi")
     assert hasil == ["warga", "bantuan", "polisi"]
+
+
+def test_nan_dari_pandas_diperlakukan_seperti_kosong():
+    # Sel kosong di CSV terbaca sebagai float NaN, yang "truthy" sehingga `x or ""` tidak menolong.
+    nan = float("nan")
+    assert teks.buang_label(nan) == ""
+    assert teks.normalisasi(nan) == ""
+    assert teks.bersihkan_judul(nan) == ""
+    assert teks.deteksi_format(nan) == "Teks / lainnya"
