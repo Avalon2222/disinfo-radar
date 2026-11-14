@@ -63,3 +63,8 @@ def test_tokenisasi_parameter_stopword_dan_panjang_minimum():
 
 def test_normalisasi_tanda_hubung_jadi_spasi():
     assert teks.normalisasi("Anti-Vaksin di https://contoh.id/x!!") == "anti vaksin di"
+
+
+def test_stopword_berakhiran_nya_tidak_terpotong_jadi_kata_aneh():
+    hasil = teks.tokenisasi("Warga bertanya soal bantuan, ditanya polisi")
+    assert hasil == ["warga", "bantuan", "polisi"]

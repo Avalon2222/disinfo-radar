@@ -128,6 +128,10 @@ def tokenisasi(teks: str, stopword: set[str] = STOPWORD, min_panjang: int = 3) -
     """Pecah teks menjadi daftar kata bermakna. Dipakai sebagai `tokenizer` TfidfVectorizer."""
     hasil = []
     for kata in normalisasi(teks).split():
+        # Cek stopword sebelum akhiran dipotong: "bertanya" dan "ditanya" adalah stopword,
+        # tapi setelah "-nya" dibuang jadi "berta" dan "dita" yang lolos ke TF-IDF.
+        if kata in stopword:
+            continue
         kata = rapikan_akhiran(kata)
         if len(kata) >= min_panjang and kata not in stopword:
             hasil.append(kata)
