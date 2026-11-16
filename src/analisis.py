@@ -155,8 +155,10 @@ def ringkasan_klaster(df: pd.DataFrame, model: ModelTopik) -> pd.DataFrame:
             "jumlah": int(len(sub)),
             "persen": round(100 * len(sub) / len(d), 1),
             "kata_kunci": ", ".join(k for k, _ in model.kata_kunci[i][:8]),
-            "kategori_dominan": f"{kategori.index[0]} ({100 * kategori.iloc[0] / len(sub):.0f}%)",
-            "tahun_puncak": int(tahun.index[0]),
+            # value_counts membuang NaN: klaster yang kategori/tahunnya kosong semua jangan IndexError.
+            "kategori_dominan": (f"{kategori.index[0]} ({100 * kategori.iloc[0] / len(sub):.0f}%)"
+                                 if not kategori.empty else "-"),
+            "tahun_puncak": int(tahun.index[0]) if not tahun.empty else None,
             "label_salah_persen": round(100 * (sub["label_kelompok"] == "Salah").mean(), 0),
             "contoh": sub["judul_bersih"].head(3).tolist(),
         })
