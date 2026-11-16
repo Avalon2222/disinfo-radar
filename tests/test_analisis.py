@@ -191,6 +191,20 @@ def test_tren_kata_dan_frekuensi_tahan_teks_kosong(df):
     assert "nan" not in f and "None" not in f
 
 
+def test_kata_naik_turun_tidak_tumpang_tindih():
+    df = pd.DataFrame({
+        "tanggal": pd.to_datetime(["2021-01-01"] * 4 + ["2023-01-01"] * 4),
+        "teks_tfidf": ["vaksin chip", "vaksin chip", "vaksin", "banjir"] + ["gempa", "gempa banjir", "gempa", "chip"],
+    })
+    tab = analisis.kata_naik_turun(df, pd.Timestamp("2022-01-01"), min_total=1, n=15)
+    naik = set(tab.loc[tab["arah"] == "Naik", "kata"])
+    turun = set(tab.loc[tab["arah"] == "Turun", "kata"])
+    assert naik.isdisjoint(turun)
+    assert (tab.loc[tab["arah"] == "Naik", "rasio"] > 1).all()
+    assert (tab.loc[tab["arah"] == "Turun", "rasio"] < 1).all()
+    assert "gempa" in naik and "vaksin" in turun
+
+
 def test_kata_naik_turun_tanpa_kata_lolos_ambang(df):
     tab = analisis.kata_naik_turun(df, pd.Timestamp("2022-01-01"), min_total=1000)
     assert tab.empty
