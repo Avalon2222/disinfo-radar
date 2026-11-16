@@ -12,6 +12,7 @@ Alur utama:
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from dataclasses import dataclass
 
@@ -182,7 +183,7 @@ def tren_kata(df: pd.DataFrame, kata: list[str]) -> pd.DataFrame:
         k_bersih = " ".join(teks.tokenisasi(k))
         if not k_bersih:          # kosong = hanya stopword/tanda baca, lewati
             continue
-        cocok = df["teks_tfidf"].str.contains(rf"\b{k_bersih}\b", regex=True)
+        cocok = df["teks_tfidf"].str.contains(rf"\b{re.escape(k_bersih)}\b", regex=True, na=False)
         hasil[k] = df.loc[cocok].groupby("bulan").size()
     if not hasil:
         return pd.DataFrame()
