@@ -76,6 +76,14 @@ def test_ringkasan_klaster(df, model):
     assert set(r.columns) >= {"nama", "jumlah", "persen", "kata_kunci", "kategori_dominan", "tahun_puncak", "contoh"}
 
 
+def test_ringkasan_klaster_kategori_dan_tahun_kosong(df, model):
+    kosong = df.assign(kategori=None, tahun=float("nan"))
+    r = analisis.ringkasan_klaster(kosong, model)
+    assert len(r) == 2
+    assert (r["kategori_dominan"] == "-").all()
+    assert r["tahun_puncak"].isna().all()
+
+
 def test_tren_bulanan_mengisi_bulan_kosong(df):
     t = analisis.tren_bulanan(df, "kategori")
     assert t.index.min() == pd.Timestamp("2021-01-01") and t.index.max() == pd.Timestamp("2023-08-01")
