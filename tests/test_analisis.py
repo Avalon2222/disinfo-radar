@@ -178,3 +178,19 @@ def test_faktorkan_bobot_tidak_negatif():
     W = nmf.transform(X)
     assert W[:4].argmax(axis=1).tolist() == [W[0].argmax()] * 4
     assert W[0].argmax() != W[4].argmax()
+
+
+def test_tren_kata_dan_frekuensi_tahan_teks_kosong(df):
+    d = df.copy()
+    d["teks_tfidf"] = d["teks_tfidf"].astype(object)
+    baris_vaksin = d.index[d["teks_tfidf"].str.contains("vaksin")][0]
+    d.loc[baris_vaksin, "teks_tfidf"] = None
+    t = analisis.tren_kata(d, ["vaksin"])
+    assert t["vaksin"].sum() == 7
+    f = analisis.frekuensi_kata(d["teks_tfidf"], n=50)
+    assert "nan" not in f and "None" not in f
+
+
+def test_kata_naik_turun_tanpa_kata_lolos_ambang(df):
+    tab = analisis.kata_naik_turun(df, pd.Timestamp("2022-01-01"), min_total=1000)
+    assert tab.empty
