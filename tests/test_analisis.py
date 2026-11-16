@@ -70,6 +70,11 @@ def test_beri_nama_menghindari_tumpang_tindih():
     assert analisis.beri_nama([]) == "(tanpa kata kunci)"
 
 
+def test_beri_nama_bandingkan_kata_utuh():
+    kk = [("polri", 0.5), ("ri", 0.4), ("air", 0.3), ("ai", 0.2)]
+    assert analisis.beri_nama(kk, n=4) == "polri · ri · air · ai"
+
+
 def test_ringkasan_klaster(df, model):
     r = analisis.ringkasan_klaster(df, model)
     assert len(r) == 2 and r["jumlah"].sum() == len(df)
