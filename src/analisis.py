@@ -109,10 +109,14 @@ def kata_kunci_klaster(vec: TfidfVectorizer, komponen: np.ndarray, n: int = 10) 
 def beri_nama(kata_kunci: list[tuple[str, float]], n: int = 3) -> str:
     """Gabungkan kata kunci teratas yang tidak saling tumpang tindih: 'vaksin · covid · chip'."""
     terpilih: list[str] = []
+    token_terpilih: set[str] = set()
     for kata, _ in kata_kunci:
-        if any(kata in t or t in kata for t in terpilih):
+        # Bandingkan per kata utuh, bukan per huruf: "ri" tidak boleh dianggap bagian dari "polri".
+        token = set(kata.split())
+        if token & token_terpilih:
             continue
         terpilih.append(kata)
+        token_terpilih |= token
         if len(terpilih) == n:
             break
     return " · ".join(terpilih) if terpilih else "(tanpa kata kunci)"
