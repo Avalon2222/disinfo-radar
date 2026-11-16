@@ -195,7 +195,7 @@ def tren_kata(df: pd.DataFrame, kata: list[str]) -> pd.DataFrame:
 def frekuensi_kata(dokumen: pd.Series, n: int = 150) -> dict[str, int]:
     """Hitung kemunculan kata tunggal pada kumpulan judul bersih (bahan word cloud dan grafik batang)."""
     c: Counter = Counter()
-    for d in dokumen:
+    for d in dokumen.dropna():
         c.update(set(str(d).split()))  # set: satu judul menyumbang maksimal 1 per kata
     return dict(c.most_common(n))
 
@@ -205,8 +205,8 @@ def kata_naik_turun(df: pd.DataFrame, batas: pd.Timestamp, min_total: int = 8, n
     Bandingkan seberapa sering sebuah kata muncul per 1.000 judul SEBELUM vs SESUDAH tanggal `batas`.
     rasio > 1 berarti kata itu makin ramai. Pemulusan +1 (Laplace) agar kata baru tidak memberi pembagian nol.
     """
-    sebelum = df[df["tanggal"] < batas]["teks_tfidf"]
-    sesudah = df[df["tanggal"] >= batas]["teks_tfidf"]
+    sebelum = df[df["tanggal"] < batas]["teks_tfidf"].dropna()
+    sesudah = df[df["tanggal"] >= batas]["teks_tfidf"].dropna()
     if sebelum.empty or sesudah.empty:
         return pd.DataFrame()
     f_lama, f_baru = Counter(), Counter()
@@ -222,6 +222,8 @@ def kata_naik_turun(df: pd.DataFrame, batas: pd.Timestamp, min_total: int = 8, n
         baris.append({"kata": k, "sebelum": f_lama[k], "sesudah": f_baru[k],
                       "per_1000_sebelum": round(laju_lama, 1), "per_1000_sesudah": round(laju_baru, 1),
                       "rasio": round(laju_baru / laju_lama, 2)})
+    if not baris:                 # tidak ada kata yang lolos min_total
+        return pd.DataFrame()
     tab = pd.DataFrame(baris)
     naik = tab.sort_values("rasio", ascending=False).head(n).assign(arah="Naik")
     turun = tab.sort_values("rasio").head(n).assign(arah="Turun")
