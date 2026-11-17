@@ -11,6 +11,14 @@ def test_buang_label_berbagai_gaya():
     assert teks.buang_label("") == ""
 
 
+def test_buang_label_kurung_tutup_terlupa_atau_salah():
+    assert teks.buang_label("[SALAH Bahlil Dorong PLN Naikkan Harga Token Listrik") == "Bahlil Dorong PLN Naikkan Harga Token Listrik"
+    assert teks.buang_label("[SALAH} Menkeu Akan Kembalikan Harga Bensin") == "Menkeu Akan Kembalikan Harga Bensin"
+    assert teks.buang_label("[SALAH Video (Lama) Banjir Jakarta") == "Video (Lama) Banjir Jakarta"
+    assert teks.buang_label("(Benarkah) Judul Biasa") == "Judul Biasa"
+    assert teks.buang_label("Salah Kaprah soal Vaksin") == "Salah Kaprah soal Vaksin"   # tanpa kurung, bukan label
+
+
 def test_normalisasi_membuang_url_angka_tanda_baca():
     hasil = teks.normalisasi("Pertalite Naik Rp13.000! cek https://contoh.id/x?y=1 (Jakarta-Bandung)")
     assert hasil == "pertalite naik rp cek jakarta bandung"
