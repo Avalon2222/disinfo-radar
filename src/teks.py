@@ -95,7 +95,16 @@ KATA_FORMAT = {
     "Pesan berantai": ("pesan berantai", "pesan", "broadcast", "whatsapp", "wa", "sms"),
 }
 
-POLA_LABEL = re.compile(r"^\s*[\[\(]\s*[^\]\)]*?\s*[\]\)]\s*")
+# "}" ikut sebagai penutup karena ada judul "[SALAH} ...". Isi label tidak boleh memuat kurung buka,
+# supaya "[SALAH Video (Lama) ..." tidak terpotong sampai kurung tutup milik judul.
+POLA_LABEL = re.compile(r"^\s*[\[\(]\s*[^\]\)}\[\(]*?\s*[\]\)}]\s*")
+# Label yang kurung tutupnya terlupa, misalnya "[SALAH Purbaya Sebut ...". Hanya label yang dikenal
+# agar kata pertama judul biasa tidak ikut terbuang.
+POLA_LABEL_TERBUKA = re.compile(
+    r"^\s*[\[\(]\s*(?:SALAH|HOAKS|HOAX|PENIPUAN|DISINFORMASI|MISINFORMASI|KLARIFIKASI|BENAR|BERITA|"
+    r"BELUM TERBUKTI|EDUKASI|PARODI|SATIRE?|CEK FAKTA)\b\s*:?\s*",
+    re.I,
+)
 POLA_URL = re.compile(r"https?://\S+|www\.\S+")
 POLA_NON_HURUF = re.compile(r"[^a-z\s]")
 POLA_SPASI = re.compile(r"\s+")
@@ -104,6 +113,7 @@ POLA_SPASI = re.compile(r"\s+")
 def buang_label(judul: str) -> str:
     """'[SALAH] Vaksin Mengandung Chip' -> 'Vaksin Mengandung Chip'. Juga membuang akhiran situs."""
     judul = POLA_LABEL.sub("", judul if isinstance(judul, str) else "")
+    judul = POLA_LABEL_TERBUKA.sub("", judul)
     judul = re.sub(r"\s*[–-]\s*TurnBackHoax\.ID\s*$", "", judul, flags=re.I)
     return judul.strip().strip('"“”\'')
 
