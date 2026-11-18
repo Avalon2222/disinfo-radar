@@ -163,3 +163,17 @@ def test_label_dan_kategori_pd_na_tidak_error():
     assert muat_data.rapikan_kategori(pd.NA) == "Lainnya"
     kolom = pd.Series(["politik", None], dtype="string")
     assert kolom.map(muat_data.rapikan_kategori).tolist() == ["Politik", "Lainnya"]
+
+
+def test_siapkan_ambil_label_dari_judul_yang_kurungnya_tidak_lengkap():
+    df = pd.DataFrame({
+        "id": [1, 2, 3],
+        "tanggal": ["2024-03-16", "2024-03-17", "2024-03-18"],
+        "judul": ["SALAH] Informasi Pasien RS", "[PENIPUAN Lowongan BUMN", "Salah Satu Gerai Dikirimi Truk"],
+        "label": ["TANPA LABEL", "TANPA LABEL", "TANPA LABEL"],
+        "kategori": ["", "", ""], "ringkasan": ["", "", ""], "url": ["", "", ""],
+    })
+    hasil = muat_data.siapkan(df).set_index("id")
+    assert hasil.loc[1, "label_kelompok"] == "Salah"
+    assert hasil.loc[2, "label_kelompok"] == "Penipuan"
+    assert hasil.loc[3, "label_kelompok"] == "Lainnya"
