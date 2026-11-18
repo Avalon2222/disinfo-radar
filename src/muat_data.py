@@ -87,6 +87,10 @@ def siapkan(df: pd.DataFrame) -> pd.DataFrame:
     batas_akhir = pd.Timestamp.today().normalize() + pd.Timedelta(days=1)
     df = df[(df["tanggal"].dt.year >= TAHUN_MIN) & (df["tanggal"] <= batas_akhir)].copy()
     df["id"] = df["id"].astype(int)
+    # Pengumpul data memberi "TANPA LABEL" bila kurung label tidak lengkap ("SALAH] ..."); ambil dari judul.
+    tanpa_label = df["label"].map(_teks).str.strip().str.upper().isin(["", "TANPA LABEL"])
+    dari_judul = df.loc[tanpa_label, "judul"].map(teks.label_dari_judul)
+    df.loc[dari_judul[dari_judul != ""].index, "label"] = dari_judul[dari_judul != ""]
     df["label_kelompok"] = df["label"].map(kelompokkan_label)
     df["kategori"] = df["kategori"].map(rapikan_kategori)
     df["judul_bersih"] = df["judul"].map(teks.buang_label)

@@ -116,6 +116,20 @@ POLA_NON_HURUF = re.compile(r"[^a-z\s]")
 POLA_SPASI = re.compile(r"\s+")
 
 
+def label_dari_judul(judul: str) -> str:
+    """Label yang dikenal dari awalan judul yang salah satu kurungnya terlupa ("SALAH] ...", "[HOAKS ...").
+
+    Mengembalikan teks label dalam huruf besar, atau "" bila tidak ada.
+    """
+    if not isinstance(judul, str):
+        return ""
+    for pola in (POLA_LABEL_TANPA_BUKA, POLA_LABEL_TERBUKA):
+        m = pola.match(judul)
+        if m:
+            return re.sub(r"[^A-Za-z ]", "", m.group(0)).strip().upper()
+    return ""
+
+
 def buang_label(judul: str) -> str:
     """'[SALAH] Vaksin Mengandung Chip' -> 'Vaksin Mengandung Chip'. Juga membuang akhiran situs."""
     judul = POLA_LABEL.sub("", judul if isinstance(judul, str) else "")
