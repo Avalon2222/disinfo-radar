@@ -15,6 +15,7 @@ Latihan di docs/LATIHAN.md mengajak mencoba Sastrawi dan membandingkan hasilnya.
 from __future__ import annotations
 
 import re
+import unicodedata
 
 # Stopword bahasa Indonesia: kata fungsi yang hampir selalu muncul dan tidak menandai topik.
 STOPWORD_UMUM = set("""
@@ -141,7 +142,11 @@ def buang_label(judul: str) -> str:
 
 def normalisasi(teks: str) -> str:
     """Huruf kecil, tanpa URL, angka, dan tanda baca. Tanda kutip ganda yang aneh ikut hilang."""
-    teks = (teks if isinstance(teks, str) else "").lower()
+    teks = teks if isinstance(teks, str) else ""
+    # NFKD mengubah huruf hias (𝐏𝐫𝐨𝐠𝐫𝐚𝐦, 𝘣𝘢𝘯𝘬) yang sering dipakai unggahan penipuan menjadi huruf biasa,
+    # dan memisahkan aksen ("Güler" -> "u" + tanda) supaya tanda aksennya saja yang terbuang.
+    teks = unicodedata.normalize("NFKD", teks)
+    teks = "".join(c for c in teks if not unicodedata.combining(c)).lower()
     teks = POLA_URL.sub(" ", teks)
     teks = teks.replace("-", " ")
     teks = POLA_NON_HURUF.sub(" ", teks)
