@@ -47,9 +47,19 @@ WARNA_LABEL = {
 WARNA_UTAMA = "#a78bfa"
 
 
+def _teks(v) -> str:
+    """Nilai sel sebagai teks; kosong untuk None/NaN/pd.NA.
+
+    Kolom dibaca dengan dtype "string", jadi sel kosong berupa pd.NA, dan `pd.NA or ""` melempar TypeError.
+    """
+    if v is None or (not isinstance(v, str) and pd.isna(v)):
+        return ""
+    return str(v)
+
+
 def kelompokkan_label(label: str) -> str:
     """'SALAH' -> 'Salah', 'HOAX' -> 'Salah', 'PENIPUAN' -> 'Penipuan', sisanya 'Lainnya'."""
-    kunci = re.sub(r"[^A-Z ]", "", str(label or "").upper()).strip()
+    kunci = re.sub(r"[^A-Z ]", "", _teks(label).upper()).strip()
     if kunci in PETA_LABEL:
         return PETA_LABEL[kunci]
     for k, v in PETA_LABEL.items():
@@ -60,7 +70,7 @@ def kelompokkan_label(label: str) -> str:
 
 def rapikan_kategori(kategori: str) -> str:
     """Kategori kosong atau 'Other' -> 'Lainnya'; kapitalisasi disamakan."""
-    k = str(kategori or "").strip()
+    k = _teks(kategori).strip()
     if not k or k.lower() in {"other", "uncategorized", "lainnya", "nan"}:
         return "Lainnya"
     return k[:1].upper() + k[1:]

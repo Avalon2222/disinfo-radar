@@ -154,3 +154,12 @@ def test_siapkan_buang_baris_dengan_id_rusak():
     hasil = muat_data.siapkan(df)
     assert hasil["id"].tolist() == [1]
     assert hasil["id"].dtype.kind == "i"
+
+
+def test_label_dan_kategori_pd_na_tidak_error():
+    import pandas as pd
+
+    assert muat_data.kelompokkan_label(pd.NA) == "Lainnya"
+    assert muat_data.rapikan_kategori(pd.NA) == "Lainnya"
+    kolom = pd.Series(["politik", None], dtype="string")
+    assert kolom.map(muat_data.rapikan_kategori).tolist() == ["Politik", "Lainnya"]
