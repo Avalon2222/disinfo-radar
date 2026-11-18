@@ -92,3 +92,9 @@ def test_buang_label_tanpa_kurung_buka():
     assert teks.buang_label("Penipuan ) Lowongan Kerja BUMN") == "Lowongan Kerja BUMN"
     # Judul biasa yang kebetulan diawali kata "Salah" tidak ikut terpotong.
     assert teks.buang_label("Salah Satu Misil Pakistan") == "Salah Satu Misil Pakistan"
+
+
+def test_normalisasi_huruf_hias_dan_aksen():
+    assert teks.normalisasi("𝐏𝐫𝐨𝐠𝐫𝐚𝐦 𝘣𝘢𝘯𝘬 𝙅𝘼𝙏𝙄𝙈") == "program bank jatim"
+    assert teks.normalisasi("Arda Güler, Lucas Vázquez") == "arda guler lucas vazquez"
+    assert teks.normalisasi("Ｖｉｒａｌ") == "viral"
