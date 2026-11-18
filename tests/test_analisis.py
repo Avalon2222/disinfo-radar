@@ -221,3 +221,11 @@ def test_kata_naik_turun_tidak_tumpang_tindih():
 def test_kata_naik_turun_tanpa_kata_lolos_ambang(df):
     tab = analisis.kata_naik_turun(df, pd.Timestamp("2022-01-01"), min_total=1000)
     assert tab.empty
+
+
+def test_tren_bulanan_nilai_kosong_tetap_dihitung(df):
+    d = df.copy()
+    d.loc[d.index[:3], "format"] = None
+    t = analisis.tren_bulanan(d, "format")
+    assert int(t.values.sum()) == len(d)
+    assert "Tidak diketahui" in t.columns
