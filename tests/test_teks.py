@@ -85,3 +85,10 @@ def test_nan_dari_pandas_diperlakukan_seperti_kosong():
     assert teks.normalisasi(nan) == ""
     assert teks.bersihkan_judul(nan) == ""
     assert teks.deteksi_format(nan) == "Teks / lainnya"
+
+
+def test_buang_label_tanpa_kurung_buka():
+    assert teks.buang_label("SALAH] Ono Surono Didemo") == "Ono Surono Didemo"
+    assert teks.buang_label("Penipuan ) Lowongan Kerja BUMN") == "Lowongan Kerja BUMN"
+    # Judul biasa yang kebetulan diawali kata "Salah" tidak ikut terpotong.
+    assert teks.buang_label("Salah Satu Misil Pakistan") == "Salah Satu Misil Pakistan"

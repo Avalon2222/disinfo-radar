@@ -105,6 +105,12 @@ POLA_LABEL_TERBUKA = re.compile(
     r"BELUM TERBUKTI|EDUKASI|PARODI|SATIRE?|CEK FAKTA)\b\s*:?\s*",
     re.I,
 )
+# Kebalikannya: kurung buka terlupa, misalnya "SALAH] Ono Surono ...". Juga hanya label yang dikenal.
+POLA_LABEL_TANPA_BUKA = re.compile(
+    r"^\s*(?:SALAH|HOAKS|HOAX|PENIPUAN|DISINFORMASI|MISINFORMASI|KLARIFIKASI|BENAR|BERITA|"
+    r"BELUM TERBUKTI|EDUKASI|PARODI|SATIRE?|CEK FAKTA)\s*[\]\)}]\s*",
+    re.I,
+)
 POLA_URL = re.compile(r"https?://\S+|www\.\S+")
 POLA_NON_HURUF = re.compile(r"[^a-z\s]")
 POLA_SPASI = re.compile(r"\s+")
@@ -114,6 +120,7 @@ def buang_label(judul: str) -> str:
     """'[SALAH] Vaksin Mengandung Chip' -> 'Vaksin Mengandung Chip'. Juga membuang akhiran situs."""
     judul = POLA_LABEL.sub("", judul if isinstance(judul, str) else "")
     judul = POLA_LABEL_TERBUKA.sub("", judul)
+    judul = POLA_LABEL_TANPA_BUKA.sub("", judul)
     judul = re.sub(r"\s*[–-]\s*TurnBackHoax\.ID\s*$", "", judul, flags=re.I)
     return judul.strip().strip('"“”\'')
 
