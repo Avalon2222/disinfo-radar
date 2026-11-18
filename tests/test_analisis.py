@@ -229,3 +229,7 @@ def test_tren_bulanan_nilai_kosong_tetap_dihitung(df):
     t = analisis.tren_bulanan(d, "format")
     assert int(t.values.sum()) == len(d)
     assert "Tidak diketahui" in t.columns
+
+
+def test_tren_kata_data_kosong(df):
+    assert analisis.tren_kata(df.iloc[0:0], ["vaksin"]).empty

@@ -187,6 +187,9 @@ def tren_bulanan(df: pd.DataFrame, kolom: str, mulai: pd.Timestamp | None = None
 def tren_kata(df: pd.DataFrame, kata: list[str]) -> pd.DataFrame:
     """Jumlah judul per bulan yang mengandung setiap kata (pencocokan kata utuh pada teks bersih)."""
     hasil = {}
+    # Tanpa judul tidak ada rentang bulan; date_range(NaT, NaT) akan error.
+    if df.empty or df["bulan"].isna().all():
+        return pd.DataFrame()
     for k in kata:
         k_bersih = " ".join(teks.tokenisasi(k))
         if not k_bersih:          # kosong = hanya stopword/tanda baca, lewati
