@@ -276,7 +276,8 @@ def cari_mirip(model: ModelTopik, klaim: str, n: int = 10) -> tuple[np.ndarray, 
     """
     v = vektor_klaim(model, [klaim])
     skor = np.asarray((model.X @ v.T).todense()).ravel()
-    urut = np.argsort(-skor, kind="stable")[:n]   # stable: skor seri tetap urut sesuai arsip
+    # max(n, 0): n negatif lewat slicing [:n] justru mengembalikan hampir seluruh arsip.
+    urut = np.argsort(-skor, kind="stable")[:max(n, 0)]   # stable: skor seri tetap urut sesuai arsip
     urut = urut[skor[urut] > 0]
     return urut, skor[urut]
 
