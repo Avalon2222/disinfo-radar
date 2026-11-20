@@ -182,3 +182,14 @@ def test_siapkan_ambil_label_dari_judul_yang_kurungnya_tidak_lengkap():
 def test_rapikan_kategori_huruf_besar_disamakan():
     hasil = {muat_data.rapikan_kategori(k) for k in ["KESEHATAN", "kesehatan", "Kesehatan", " kesehatan "]}
     assert hasil == {"Kesehatan"}
+
+
+def test_siapkan_artikel_ganda_dihitung_sekali():
+    df = pd.DataFrame({
+        "id": [7, 7, 8], "tanggal": ["2024-01-01", "2024-01-03", "2024-01-02"],
+        "judul": ["[SALAH] Vaksin Chip", "[SALAH] Vaksin Chip Lagi", "[HOAKS] Banjir"],
+        "label": ["SALAH", "SALAH", "HOAKS"], "kategori": ["Kesehatan", "Kesehatan", "Bencana"], "ringkasan": ["", "", ""],
+    })
+    hasil = muat_data.siapkan(df)
+    assert sorted(hasil["id"]) == [7, 8]
+    assert hasil.loc[hasil["id"] == 7, "judul_bersih"].item() == "Vaksin Chip Lagi"
