@@ -226,7 +226,7 @@ with tab_radar:
     rss = ambil_rss(kunci_waktu)
     if rss.sumber == "live" and not rss.data.empty:
         baru = rss.data.copy()
-        baru["Topik terdekat"] = [model.nama[k] for k in analisis.prediksi_klaster(model, baru["judul"].tolist())]
+        baru["Topik terdekat"] = [model.nama_topik(k) for k in analisis.prediksi_klaster(model, baru["judul"].tolist())]
         baru["Sudah di arsip"] = baru["id"].isin(df_arsip["id"]).map({True: "ya", False: "belum"})
         tampil = pd.DataFrame({
             "Tanggal": baru["tanggal"].dt.strftime("%d/%m/%Y"),
@@ -433,7 +433,7 @@ with tab_cek:
         idx, skor = analisis.cari_mirip(model, klaim, n=n_mirip)
         k_pred = int(analisis.prediksi_klaster(model, [klaim])[0])
         dikenal = analisis.kata_dikenali(model, klaim)
-        st.markdown(f"**Topik terdekat:** `{model.nama[k_pred]}` &nbsp;·&nbsp; kata yang dikenali model: "
+        st.markdown(f"**Topik terdekat:** `{model.nama_topik(k_pred)}` &nbsp;·&nbsp; kata yang dikenali model: "
                     + (", ".join(f"`{t}`" for t in dikenal) if dikenal else "*(tidak ada, jadi topiknya cuma tebakan)*"))
         hasil = df.loc[idx].copy()
         hasil["Kemiripan"] = skor

@@ -71,10 +71,22 @@ class ModelTopik:
     nama: dict[int, str]
 
     def prediksi(self, V) -> np.ndarray:
-        """Topik untuk vektor TF-IDF baru V (bentuk n x kata)."""
+        """Topik untuk vektor TF-IDF baru V (bentuk n x kata).
+
+        Baris tanpa satu pun kata yang dikenal kosakata model mendapat -1: NMF memberinya bobot nol
+        di semua topik (argmax lalu selalu jatuh ke topik 0) dan K-Means memilih pusat terdekat dari
+        vektor nol, jadi topik apa pun yang keluar hanyalah kebetulan.
+        """
         if self.metode == "NMF":
-            return self.model.transform(V).argmax(axis=1)
-        return self.model.predict(V)
+            hasil = self.model.transform(V).argmax(axis=1)
+        else:
+            hasil = self.model.predict(V)
+        kosong = np.asarray(abs(V).sum(axis=1)).ravel() == 0
+        return np.where(kosong, -1, hasil)
+
+    def nama_topik(self, k: int) -> str:
+        """Nama topik, termasuk untuk -1 (klaim tanpa kata yang dikenali)."""
+        return self.nama.get(int(k), "(tidak dikenali)")
 
 
 def klasterkan(X, k: int, seed: int = 42) -> KMeans:
