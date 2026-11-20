@@ -88,6 +88,9 @@ def siapkan(df: pd.DataFrame) -> pd.DataFrame:
     batas_akhir = pd.Timestamp.today().normalize() + pd.Timedelta(days=1)
     df = df[(df["tanggal"].dt.year >= TAHUN_MIN) & (df["tanggal"] <= batas_akhir)].copy()
     df["id"] = df["id"].astype(int)
+    # id adalah kunci artikel: artikel yang terambil dua kali (mis. saat pengumpul data diulang)
+    # cukup dihitung sekali, pakai versi dengan tanggal terbaru.
+    df = df.sort_values("tanggal").drop_duplicates("id", keep="last")
     # Pengumpul data memberi "TANPA LABEL" bila kurung label tidak lengkap ("SALAH] ..."); ambil dari judul.
     tanpa_label = df["label"].map(_teks).str.strip().str.upper().isin(["", "TANPA LABEL"])
     dari_judul = df.loc[tanpa_label, "judul"].map(teks.label_dari_judul)
