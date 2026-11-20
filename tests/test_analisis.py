@@ -241,3 +241,9 @@ def test_prediksi_klaim_tanpa_kata_dikenal_tidak_ditebak(model):
     assert hasil[1] != -1
     assert model.nama_topik(-1) == "(tidak dikenali)"
     assert model.nama_topik(hasil[1]) == model.nama[hasil[1]]
+
+
+def test_cari_mirip_n_nol_atau_negatif_kosong(model):
+    for n in (0, -1):
+        idx, skor = analisis.cari_mirip(model, "vaksin covid chip", n=n)
+        assert len(idx) == 0 and len(skor) == 0
