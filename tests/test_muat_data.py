@@ -177,3 +177,8 @@ def test_siapkan_ambil_label_dari_judul_yang_kurungnya_tidak_lengkap():
     assert hasil.loc[1, "label_kelompok"] == "Salah"
     assert hasil.loc[2, "label_kelompok"] == "Penipuan"
     assert hasil.loc[3, "label_kelompok"] == "Lainnya"
+
+
+def test_rapikan_kategori_huruf_besar_disamakan():
+    hasil = {muat_data.rapikan_kategori(k) for k in ["KESEHATAN", "kesehatan", "Kesehatan", " kesehatan "]}
+    assert hasil == {"Kesehatan"}

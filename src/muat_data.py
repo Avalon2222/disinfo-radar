@@ -73,7 +73,8 @@ def rapikan_kategori(kategori: str) -> str:
     k = _teks(kategori).strip()
     if not k or k.lower() in {"other", "uncategorized", "lainnya", "nan"}:
         return "Lainnya"
-    return k[:1].upper() + k[1:]
+    # "KESEHATAN", "kesehatan", dan "Kesehatan" harus jadi satu kategori, bukan tiga.
+    return k[:1].upper() + k[1:].lower()
 
 
 def siapkan(df: pd.DataFrame) -> pd.DataFrame:
