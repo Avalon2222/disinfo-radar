@@ -233,3 +233,11 @@ def test_tren_bulanan_nilai_kosong_tetap_dihitung(df):
 
 def test_tren_kata_data_kosong(df):
     assert analisis.tren_kata(df.iloc[0:0], ["vaksin"]).empty
+
+
+def test_prediksi_klaim_tanpa_kata_dikenal_tidak_ditebak(model):
+    hasil = analisis.prediksi_klaster(model, ["zzzqx wqqpl", "vaksin covid chip"])
+    assert hasil[0] == -1
+    assert hasil[1] != -1
+    assert model.nama_topik(-1) == "(tidak dikenali)"
+    assert model.nama_topik(hasil[1]) == model.nama[hasil[1]]
