@@ -110,3 +110,10 @@ def test_label_tanpa_kurung_dengan_titik_dua():
     assert teks.label_dari_judul("HOAX: Foto Kondisi Terbaru") == "HOAX"
     # tanpa titik dua, kata pertama judul biasa dibiarkan
     assert teks.buang_label("Berita Banjir Jakarta") == "Berita Banjir Jakarta"
+
+
+def test_buang_label_kutipan_sebagian_tidak_terpotong():
+    assert teks.buang_label('[SALAH] "Kutipan" kata Menteri') == '"Kutipan" kata Menteri'
+    assert teks.buang_label('[SALAH] "Judul utuh dalam kutip"') == "Judul utuh dalam kutip"
+    assert teks.buang_label('[SALAH] “Kutip pembuka saja') == "Kutip pembuka saja"
+    assert teks.buang_label("[SALAH] \"Jum'at Berkah\"") == "Jum'at Berkah"

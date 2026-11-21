@@ -146,7 +146,26 @@ def buang_label(judul: str) -> str:
     judul = POLA_LABEL_TANPA_BUKA.sub("", judul)
     judul = POLA_LABEL_TITIK_DUA.sub("", judul)
     judul = re.sub(r"\s*[–-]\s*TurnBackHoax\.ID\s*$", "", judul, flags=re.I)
-    return judul.strip().strip('"“”\'')
+    return _buang_kutip_luar(judul.strip())
+
+
+_KUTIP = '"“”\''
+# Apostrof di tengah kata (Jum'at) bukan tanda kutip, jadi isi judul hanya dicek untuk kutip ganda.
+_KUTIP_GANDA = '"“”'
+
+
+def _buang_kutip_luar(judul: str) -> str:
+    """Buang tanda kutip pembungkus, tanpa memotong kutipan yang hanya mengapit sebagian judul.
+
+    '"Kutipan" kata Menteri' dulu menjadi 'Kutipan" kata Menteri' karena strip() hanya memotong kutip depan.
+    """
+    if len(judul) >= 2 and judul[0] in _KUTIP and judul[-1] in _KUTIP and not any(c in _KUTIP_GANDA for c in judul[1:-1]):
+        return judul[1:-1].strip()
+    if judul[:1] in _KUTIP and not any(c in _KUTIP_GANDA for c in judul[1:]):
+        return judul[1:].strip()  # kutip pembuka tanpa penutup
+    if judul[-1:] in _KUTIP and not any(c in _KUTIP_GANDA for c in judul[:-1]):
+        return judul[:-1].strip()  # kutip penutup tanpa pembuka
+    return judul
 
 
 def normalisasi(teks: str) -> str:
