@@ -113,6 +113,13 @@ POLA_LABEL_TANPA_BUKA = re.compile(
     r"BELUM TERBUKTI|EDUKASI|PARODI|SATIRE?|CEK FAKTA)\s*[\]\)}]\s*:?\s*",
     re.I,
 )
+# Label tanpa kurung sama sekali tetapi diikuti titik dua, gaya arsip lama: "HOAX: Foto ...".
+# Titik dua wajib, supaya judul yang memang diawali kata "Berita" atau "Benar" tidak ikut terpotong.
+POLA_LABEL_TITIK_DUA = re.compile(
+    r"^\s*(?:SALAH|HOAKS|HOAX|PENIPUAN|DISINFORMASI|MISINFORMASI|KLARIFIKASI|"
+    r"BELUM TERBUKTI|EDUKASI|PARODI|SATIRE?|CEK FAKTA)\s*:\s*",
+    re.I,
+)
 POLA_URL = re.compile(r"https?://\S+|www\.\S+")
 POLA_NON_HURUF = re.compile(r"[^a-z\s]")
 POLA_SPASI = re.compile(r"\s+")
@@ -125,7 +132,7 @@ def label_dari_judul(judul: str) -> str:
     """
     if not isinstance(judul, str):
         return ""
-    for pola in (POLA_LABEL_TANPA_BUKA, POLA_LABEL_TERBUKA):
+    for pola in (POLA_LABEL_TANPA_BUKA, POLA_LABEL_TERBUKA, POLA_LABEL_TITIK_DUA):
         m = pola.match(judul)
         if m:
             return re.sub(r"[^A-Za-z ]", "", m.group(0)).strip().upper()
@@ -137,6 +144,7 @@ def buang_label(judul: str) -> str:
     judul = POLA_LABEL.sub("", judul if isinstance(judul, str) else "")
     judul = POLA_LABEL_TERBUKA.sub("", judul)
     judul = POLA_LABEL_TANPA_BUKA.sub("", judul)
+    judul = POLA_LABEL_TITIK_DUA.sub("", judul)
     judul = re.sub(r"\s*[–-]\s*TurnBackHoax\.ID\s*$", "", judul, flags=re.I)
     return judul.strip().strip('"“”\'')
 

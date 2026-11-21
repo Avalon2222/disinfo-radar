@@ -103,3 +103,10 @@ def test_normalisasi_huruf_hias_dan_aksen():
 def test_buang_label_diikuti_titik_dua():
     assert teks.buang_label("[HOAKS]: Pesan Berantai") == "Pesan Berantai"
     assert teks.buang_label("SALAH]: Pesan Berantai") == "Pesan Berantai"
+
+
+def test_label_tanpa_kurung_dengan_titik_dua():
+    assert teks.buang_label("HOAX: Foto Kondisi Terbaru") == "Foto Kondisi Terbaru"
+    assert teks.label_dari_judul("HOAX: Foto Kondisi Terbaru") == "HOAX"
+    # tanpa titik dua, kata pertama judul biasa dibiarkan
+    assert teks.buang_label("Berita Banjir Jakarta") == "Berita Banjir Jakarta"
