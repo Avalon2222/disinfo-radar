@@ -98,7 +98,8 @@ KATA_FORMAT = {
 
 # "}" ikut sebagai penutup karena ada judul "[SALAH} ...". Isi label tidak boleh memuat kurung buka,
 # supaya "[SALAH Video (Lama) ..." tidak terpotong sampai kurung tutup milik judul.
-POLA_LABEL = re.compile(r"^\s*[\[\(]\s*[^\]\)}\[\(]*?\s*[\]\)}]\s*")
+# Titik dua setelah label ("[HOAKS]: ...") ikut dibuang agar judul tidak diawali ":".
+POLA_LABEL = re.compile(r"^\s*[\[\(]\s*[^\]\)}\[\(]*?\s*[\]\)}]\s*:?\s*")
 # Label yang kurung tutupnya terlupa, misalnya "[SALAH Purbaya Sebut ...". Hanya label yang dikenal
 # agar kata pertama judul biasa tidak ikut terbuang.
 POLA_LABEL_TERBUKA = re.compile(
@@ -109,7 +110,7 @@ POLA_LABEL_TERBUKA = re.compile(
 # Kebalikannya: kurung buka terlupa, misalnya "SALAH] Ono Surono ...". Juga hanya label yang dikenal.
 POLA_LABEL_TANPA_BUKA = re.compile(
     r"^\s*(?:SALAH|HOAKS|HOAX|PENIPUAN|DISINFORMASI|MISINFORMASI|KLARIFIKASI|BENAR|BERITA|"
-    r"BELUM TERBUKTI|EDUKASI|PARODI|SATIRE?|CEK FAKTA)\s*[\]\)}]\s*",
+    r"BELUM TERBUKTI|EDUKASI|PARODI|SATIRE?|CEK FAKTA)\s*[\]\)}]\s*:?\s*",
     re.I,
 )
 POLA_URL = re.compile(r"https?://\S+|www\.\S+")

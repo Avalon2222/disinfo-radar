@@ -98,3 +98,8 @@ def test_normalisasi_huruf_hias_dan_aksen():
     assert teks.normalisasi("𝐏𝐫𝐨𝐠𝐫𝐚𝐦 𝘣𝘢𝘯𝘬 𝙅𝘼𝙏𝙄𝙈") == "program bank jatim"
     assert teks.normalisasi("Arda Güler, Lucas Vázquez") == "arda guler lucas vazquez"
     assert teks.normalisasi("Ｖｉｒａｌ") == "viral"
+
+
+def test_buang_label_diikuti_titik_dua():
+    assert teks.buang_label("[HOAKS]: Pesan Berantai") == "Pesan Berantai"
+    assert teks.buang_label("SALAH]: Pesan Berantai") == "Pesan Berantai"
