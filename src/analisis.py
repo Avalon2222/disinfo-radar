@@ -252,6 +252,7 @@ def kata_naik_turun(df: pd.DataFrame, batas: pd.Timestamp, min_total: int = 8, n
     tab = pd.DataFrame(baris)
     # Pisahkan dulu menurut arah: tanpa ini, kalau kata yang lolos sedikit, kata yang sama
     # bisa muncul di daftar "Naik" sekaligus "Turun" (atau kata dengan rasio 1 ikut terpajang).
+    n = max(n, 0)   # head(-n) mengembalikan hampir semua kata, bukan nol
     naik = tab[tab["rasio"] > 1].sort_values(["rasio", "kata"], ascending=[False, True]).head(n).assign(arah="Naik")
     turun = tab[tab["rasio"] < 1].sort_values(["rasio", "kata"]).head(n).assign(arah="Turun")
     return pd.concat([naik, turun], ignore_index=True)
