@@ -257,3 +257,7 @@ def test_kata_kunci_klaster_batas_negatif_dan_bobot_seri():
     assert analisis.kata_kunci_klaster(vec, komponen, n=-1) == {0: []}
     kata = [k for k, _ in analisis.kata_kunci_klaster(vec, komponen, n=3)[0]]
     assert kata == ["alpha", "beta", "delta"]
+
+
+def test_kata_naik_turun_batas_negatif_kosong(df):
+    assert analisis.kata_naik_turun(df, pd.Timestamp("2022-01-01"), min_total=3, n=-2).empty
