@@ -247,3 +247,13 @@ def test_cari_mirip_n_nol_atau_negatif_kosong(model):
     for n in (0, -1):
         idx, skor = analisis.cari_mirip(model, "vaksin covid chip", n=n)
         assert len(idx) == 0 and len(skor) == 0
+
+
+def test_kata_kunci_klaster_batas_negatif_dan_bobot_seri():
+    from sklearn.feature_extraction.text import TfidfVectorizer
+
+    vec = TfidfVectorizer().fit(["alpha beta gamma delta"])
+    komponen = np.array([[0.5, 0.5, 0.5, 0.1]])   # alpha, beta, delta, gamma (urut abjad kosakata)
+    assert analisis.kata_kunci_klaster(vec, komponen, n=-1) == {0: []}
+    kata = [k for k, _ in analisis.kata_kunci_klaster(vec, komponen, n=3)[0]]
+    assert kata == ["alpha", "beta", "delta"]
