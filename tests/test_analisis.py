@@ -261,3 +261,11 @@ def test_kata_kunci_klaster_batas_negatif_dan_bobot_seri():
 
 def test_kata_naik_turun_batas_negatif_kosong(df):
     assert analisis.kata_naik_turun(df, pd.Timestamp("2022-01-01"), min_total=3, n=-2).empty
+
+
+def test_frekuensi_kata_seri_urut_abjad():
+    kata = [f"kata{i:02d}" for i in range(40)]
+    dokumen = pd.Series([" ".join(kata), " ".join(kata[::-1]), "zeta"])
+    hasil = list(analisis.frekuensi_kata(dokumen, n=10))
+    assert hasil == kata[:10]
+    assert analisis.frekuensi_kata(dokumen, n=-1) == {}

@@ -222,7 +222,10 @@ def frekuensi_kata(dokumen: pd.Series, n: int = 150) -> dict[str, int]:
     c: Counter = Counter()
     for d in dokumen.dropna():
         c.update(set(str(d).split()))  # set: satu judul menyumbang maksimal 1 per kata
-    return dict(c.most_common(n))
+    # most_common memutus seri menurut urutan sisip, yang di sini berasal dari iterasi set (acak per
+    # proses karena hash string). Urutkan eksplisit: jumlah menurun, lalu abjad.
+    urut = sorted(c.items(), key=lambda kv: (-kv[1], kv[0]))
+    return dict(urut if n is None else urut[:max(n, 0)])
 
 
 def kata_naik_turun(df: pd.DataFrame, batas: pd.Timestamp, min_total: int = 8, n: int = 15) -> pd.DataFrame:
