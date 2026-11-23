@@ -113,7 +113,9 @@ def kata_kunci_klaster(vec: TfidfVectorizer, komponen: np.ndarray, n: int = 10) 
     fitur = np.asarray(vec.get_feature_names_out())
     hasil = {}
     for i, baris in enumerate(komponen):
-        urut = np.argsort(baris)[::-1][:n]
+        # argsort(-baris) stabil: bobot seri tetap urut abjad kosakata (argsort()[::-1] membaliknya),
+        # dan max(n, 0) mencegah [:-n] mengembalikan hampir seluruh kosakata.
+        urut = np.argsort(-np.asarray(baris), kind="stable")[:max(n, 0)]
         hasil[i] = [(fitur[j], float(baris[j])) for j in urut if baris[j] > 0]
     return hasil
 
