@@ -206,3 +206,16 @@ def test_siapkan_artikel_ganda_tanggal_sama_pakai_salinan_terakhir():
     hasil = muat_data.siapkan(df)
     assert len(hasil) == n
     assert hasil["judul"].str.contains("baru").all()
+
+
+def test_siapkan_tanggal_sama_urut_id_terbesar_dulu():
+    n = 120
+    df = pd.DataFrame({
+        "id": [(i * 37) % n for i in range(n)],
+        "tanggal": [f"2024-05-0{1 + i % 3}" for i in range(n)],
+        "judul": [f"[SALAH] judul {i}" for i in range(n)],
+        "label": ["SALAH"] * n, "kategori": [""] * n, "ringkasan": [""] * n, "url": [""] * n,
+    })
+    hasil = muat_data.siapkan(df)
+    kunci = list(zip(hasil["tanggal"], hasil["id"]))
+    assert kunci == sorted(kunci, reverse=True)
