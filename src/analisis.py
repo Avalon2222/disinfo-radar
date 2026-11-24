@@ -194,6 +194,9 @@ def tren_bulanan(df: pd.DataFrame, kolom: str, mulai: pd.Timestamp | None = None
     # pivot_table membuang baris yang nilai `kolom`-nya kosong; hitung sebagai "Tidak diketahui".
     d = d.assign(**{kolom: d[kolom].astype(object).where(d[kolom].notna(), "Tidak diketahui")})
     pv = d.pivot_table(index="bulan", columns=kolom, values="id", aggfunc="count", fill_value=0)
+    # Semua artikel tanpa tanggal: pivot kosong dan date_range(NaT, NaT) melempar ValueError.
+    if pv.empty:
+        return pd.DataFrame()
     semua_bulan = pd.date_range(pv.index.min(), pv.index.max(), freq="MS")
     return pv.reindex(semua_bulan, fill_value=0).rename_axis("bulan")
 

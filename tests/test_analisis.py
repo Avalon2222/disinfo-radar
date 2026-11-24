@@ -96,6 +96,11 @@ def test_tren_bulanan_mengisi_bulan_kosong(df):
     assert analisis.tren_bulanan(df[df["id"] < 0], "kategori").empty
 
 
+def test_tren_bulanan_semua_tanpa_tanggal(df):
+    tanpa = df.assign(tanggal=pd.NaT, bulan=pd.NaT)
+    assert analisis.tren_bulanan(tanpa, "kategori").empty
+
+
 def test_tren_kata(df):
     t = analisis.tren_kata(df, ["vaksin", "Gempa", "yang"])   # 'yang' = stopword -> dilewati
     assert list(t.columns) == ["vaksin", "Gempa"]
