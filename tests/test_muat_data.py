@@ -193,3 +193,16 @@ def test_siapkan_artikel_ganda_dihitung_sekali():
     hasil = muat_data.siapkan(df)
     assert sorted(hasil["id"]) == [7, 8]
     assert hasil.loc[hasil["id"] == 7, "judul_bersih"].item() == "Vaksin Chip Lagi"
+
+
+def test_siapkan_artikel_ganda_tanggal_sama_pakai_salinan_terakhir():
+    n = 150
+    df = pd.DataFrame({
+        "id": list(range(n)) * 2,
+        "tanggal": ["2024-05-01"] * (2 * n),
+        "judul": [f"[SALAH] lama {i}" for i in range(n)] + [f"[SALAH] baru {i}" for i in range(n)],
+        "label": ["SALAH"] * (2 * n), "kategori": [""] * (2 * n), "ringkasan": [""] * (2 * n), "url": [""] * (2 * n),
+    })
+    hasil = muat_data.siapkan(df)
+    assert len(hasil) == n
+    assert hasil["judul"].str.contains("baru").all()
