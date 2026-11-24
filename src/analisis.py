@@ -291,4 +291,5 @@ def cari_mirip(model: ModelTopik, klaim: str, n: int = 10) -> tuple[np.ndarray, 
 def kata_dikenali(model: ModelTopik, klaim: str) -> list[str]:
     """Kata dari klaim (setelah dibersihkan dengan cara yang sama) yang ada di kosakata model."""
     kosakata = model.vectorizer.vocabulary_
-    return [t for t in teks.bersihkan_judul(klaim).split() if t in kosakata]
+    # Kata yang diulang di klaim ("vaksin ... vaksin") cukup ditampilkan sekali.
+    return list(dict.fromkeys(t for t in teks.bersihkan_judul(klaim).split() if t in kosakata))
