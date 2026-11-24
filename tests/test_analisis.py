@@ -269,3 +269,9 @@ def test_frekuensi_kata_seri_urut_abjad():
     hasil = list(analisis.frekuensi_kata(dokumen, n=10))
     assert hasil == kata[:10]
     assert analisis.frekuensi_kata(dokumen, n=-1) == {}
+
+
+def test_kata_dikenali_tanpa_duplikat(model):
+    dikenal = analisis.kata_dikenali(model, "vaksin covid vaksin chip vaksin")
+    assert dikenal.count("vaksin") == 1
+    assert dikenal == list(dict.fromkeys(dikenal))
