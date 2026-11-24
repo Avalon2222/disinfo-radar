@@ -103,7 +103,9 @@ def siapkan(df: pd.DataFrame) -> pd.DataFrame:
     df["format"] = df["judul"].map(teks.deteksi_format)
     df["bulan"] = df["tanggal"].dt.to_period("M").dt.to_timestamp()
     df["tahun"] = df["tanggal"].dt.year
-    return df.sort_values("tanggal", ascending=False).reset_index(drop=True)
+    # Banyak artikel terbit di hari yang sama; id (nomor artikel di situs) memutus seri agar
+    # daftar "terbaru" tidak berganti urutan setiap kali data dimuat ulang.
+    return df.sort_values(["tanggal", "id"], ascending=False).reset_index(drop=True)
 
 
 def muat_arsip(path: Path = BERKAS_ARSIP) -> pd.DataFrame:
