@@ -219,3 +219,12 @@ def test_siapkan_tanggal_sama_urut_id_terbesar_dulu():
     hasil = muat_data.siapkan(df)
     kunci = list(zip(hasil["tanggal"], hasil["id"]))
     assert kunci == sorted(kunci, reverse=True)
+
+
+def test_siapkan_buang_id_tak_hingga():
+    df = pd.DataFrame({
+        "id": ["1", "inf", "-inf"], "tanggal": ["2024-01-01"] * 3, "judul": ["[SALAH] a", "b", "c"],
+        "label": ["SALAH"] * 3, "kategori": ["x"] * 3, "ringkasan": [""] * 3,
+    })
+    hasil = muat_data.siapkan(df)
+    assert hasil["id"].tolist() == [1]
