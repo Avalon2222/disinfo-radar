@@ -83,6 +83,8 @@ def siapkan(df: pd.DataFrame) -> pd.DataFrame:
     df["tanggal"] = pd.to_datetime(df["tanggal"], errors="coerce")
     # id dipakai sebagai kunci artikel; baris tanpa id angka tidak bisa dipakai dan dibuang.
     df["id"] = pd.to_numeric(df["id"], errors="coerce")
+    # "inf" lolos dari dropna lalu membuat astype(int) di bawah error untuk seluruh arsip.
+    df["id"] = df["id"].where(df["id"].abs() != float("inf"))
     df = df.dropna(subset=["id", "tanggal", "judul"]).copy()
     # Sebagian kecil artikel tampil dengan tanggal mustahil di situs (tahun 1000, 6325, atau di masa depan); dibuang.
     batas_akhir = pd.Timestamp.today().normalize() + pd.Timedelta(days=1)
