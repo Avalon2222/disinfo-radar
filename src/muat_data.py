@@ -148,7 +148,8 @@ def urai_rss(teks_xml: str) -> pd.DataFrame:
         m = re.search(r"/articles/(\d+)", url)
         try:
             tanggal = _ke_wib(parsedate_to_datetime(tgl)) if tgl else pd.NaT
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, OverflowError):
+            # OverflowError: tanggal di ujung kalender (31 Des 9999 -0500) melewati tahun 9999 saat digeser ke WIB.
             tanggal = pd.NaT
         baris.append({
             "id": int(m.group(1)) if m else -1,

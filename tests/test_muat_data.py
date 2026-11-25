@@ -238,3 +238,16 @@ def test_siapkan_id_pecahan_tidak_menimpa_artikel_lain():
     hasil = muat_data.siapkan(df)
     assert hasil["id"].tolist() == [12]
     assert hasil["judul"].tolist() == ["[SALAH] asli"]
+
+
+def test_urai_rss_tanggal_meluap_jadi_nat():
+    xml = (
+        "<rss><channel>"
+        "<item><title>a</title><link>https://x/articles/5</link><pubDate>Fri, 31 Dec 9999 23:00:00 -0500</pubDate></item>"
+        "<item><title>b</title><link>https://x/articles/6</link><pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate></item>"
+        "</channel></rss>"
+    )
+    df = muat_data.urai_rss(xml)
+    assert df["id"].tolist() == [5, 6]
+    assert pd.isna(df.loc[0, "tanggal"])
+    assert df.loc[1, "tanggal"] == pd.Timestamp("2024-01-01 07:00")
