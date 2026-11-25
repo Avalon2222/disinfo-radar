@@ -228,3 +228,13 @@ def test_siapkan_buang_id_tak_hingga():
     })
     hasil = muat_data.siapkan(df)
     assert hasil["id"].tolist() == [1]
+
+
+def test_siapkan_id_pecahan_tidak_menimpa_artikel_lain():
+    df = pd.DataFrame({
+        "id": ["12", "12.5"], "tanggal": ["2024-01-01", "2024-02-01"], "judul": ["[SALAH] asli", "[SALAH] rusak"],
+        "label": ["SALAH"] * 2, "kategori": ["x"] * 2, "ringkasan": [""] * 2,
+    })
+    hasil = muat_data.siapkan(df)
+    assert hasil["id"].tolist() == [12]
+    assert hasil["judul"].tolist() == ["[SALAH] asli"]
