@@ -106,6 +106,8 @@ def siapkan(df: pd.DataFrame) -> pd.DataFrame:
     df["id"] = df["id"].where(df["id"].abs() != float("inf"))
     # id pecahan (12.5) bukan nomor artikel; astype(int) memotongnya jadi 12 dan bisa menimpa artikel 12 asli.
     df["id"] = df["id"].where(df["id"] % 1 == 0)
+    # Judul yang isinya spasi saja lolos dropna dan tampil sebagai kartu kosong; anggap tidak ada judul.
+    df["judul"] = df["judul"].map(lambda j: j if isinstance(j, str) and j.strip() else None)
     df = df.dropna(subset=["id", "tanggal", "judul"]).copy()
     # Sebagian kecil artikel tampil dengan tanggal mustahil di situs (tahun 1000, 6325, atau di masa depan); dibuang.
     batas_akhir = pd.Timestamp.today().normalize() + pd.Timedelta(days=1)

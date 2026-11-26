@@ -271,3 +271,11 @@ def test_siapkan_tanggal_berzona_waktu_disamakan_ke_wib():
 def test_rapikan_kategori_spasi_ganda_jadi_satu_kategori():
     assert muat_data.rapikan_kategori("Sosial  Budaya") == muat_data.rapikan_kategori("sosial budaya") == "Sosial budaya"
     assert muat_data.rapikan_kategori(" \t ") == "Lainnya"
+
+
+def test_siapkan_buang_judul_kosong():
+    df = pd.DataFrame({
+        "id": ["1", "2"], "tanggal": ["2024-01-01"] * 2, "judul": ["[SALAH] a", "   "],
+        "label": ["SALAH"] * 2, "kategori": ["x"] * 2, "ringkasan": [""] * 2,
+    })
+    assert muat_data.siapkan(df)["id"].tolist() == [1]
