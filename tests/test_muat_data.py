@@ -251,3 +251,18 @@ def test_urai_rss_tanggal_meluap_jadi_nat():
     assert df["id"].tolist() == [5, 6]
     assert pd.isna(df.loc[0, "tanggal"])
     assert df.loc[1, "tanggal"] == pd.Timestamp("2024-01-01 07:00")
+
+
+def test_siapkan_tanggal_berzona_waktu_disamakan_ke_wib():
+    df = pd.DataFrame({
+        "id": ["1", "2", "3"],
+        "tanggal": ["2024-01-01", "2024-01-02T20:00:00+00:00", "2024-01-03T05:00:00+07:00"],
+        "judul": ["[SALAH] a", "[SALAH] b", "[SALAH] c"],
+        "label": ["SALAH"] * 3, "kategori": ["x"] * 3, "ringkasan": [""] * 3,
+    })
+    hasil = muat_data.siapkan(df).sort_values("id")
+    # 20:00 UTC tanggal 2 = 03:00 WIB tanggal 3; tidak ada baris yang hilang jadi NaT.
+    assert hasil["tanggal"].dt.strftime("%Y-%m-%d %H:%M").tolist() == [
+        "2024-01-01 00:00", "2024-01-03 03:00", "2024-01-03 05:00",
+    ]
+    assert hasil["tanggal"].dt.tz is None

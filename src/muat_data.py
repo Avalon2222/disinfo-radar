@@ -77,10 +77,28 @@ def rapikan_kategori(kategori: str) -> str:
     return k[:1].upper() + k[1:].lower()
 
 
+def _ke_tanggal_wib(kolom: pd.Series) -> pd.Series:
+    """Tanggal arsip sebagai datetime WIB tanpa zona.
+
+    Tanggal berzona waktu ("2024-01-02T05:00:00+07:00") dulu membuat perbandingan dengan batas tanggal
+    error, dan campuran tanggal biasa dengan tanggal berzona diam-diam menjadi NaT lalu dibuang.
+    """
+    def satu(v):
+        try:
+            t = pd.Timestamp(v)
+        except (TypeError, ValueError, OverflowError):
+            return pd.NaT
+        if t is pd.NaT:
+            return pd.NaT
+        return _ke_wib(t.to_pydatetime()) if t.tzinfo is not None else t
+
+    return pd.to_datetime(kolom.map(satu), errors="coerce")
+
+
 def siapkan(df: pd.DataFrame) -> pd.DataFrame:
     """Tambahkan kolom turunan yang dipakai seluruh aplikasi."""
     df = df.copy()
-    df["tanggal"] = pd.to_datetime(df["tanggal"], errors="coerce")
+    df["tanggal"] = _ke_tanggal_wib(df["tanggal"])
     # id dipakai sebagai kunci artikel; baris tanpa id angka tidak bisa dipakai dan dibuang.
     df["id"] = pd.to_numeric(df["id"], errors="coerce")
     # "inf" lolos dari dropna lalu membuat astype(int) di bawah error untuk seluruh arsip.
