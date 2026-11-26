@@ -70,7 +70,8 @@ def kelompokkan_label(label: str) -> str:
 
 def rapikan_kategori(kategori: str) -> str:
     """Kategori kosong atau 'Other' -> 'Lainnya'; kapitalisasi disamakan."""
-    k = _teks(kategori).strip()
+    # Spasi ganda ("Sosial  Budaya") dari suntingan manual jangan sampai jadi kategori terpisah.
+    k = " ".join(_teks(kategori).split())
     if not k or k.lower() in {"other", "uncategorized", "lainnya", "nan"}:
         return "Lainnya"
     # "KESEHATAN", "kesehatan", dan "Kesehatan" harus jadi satu kategori, bukan tiga.
