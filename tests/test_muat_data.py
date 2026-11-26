@@ -266,3 +266,8 @@ def test_siapkan_tanggal_berzona_waktu_disamakan_ke_wib():
         "2024-01-01 00:00", "2024-01-03 03:00", "2024-01-03 05:00",
     ]
     assert hasil["tanggal"].dt.tz is None
+
+
+def test_rapikan_kategori_spasi_ganda_jadi_satu_kategori():
+    assert muat_data.rapikan_kategori("Sosial  Budaya") == muat_data.rapikan_kategori("sosial budaya") == "Sosial budaya"
+    assert muat_data.rapikan_kategori(" \t ") == "Lainnya"
