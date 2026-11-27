@@ -187,7 +187,9 @@ def ringkasan_klaster(df: pd.DataFrame, model: ModelTopik) -> pd.DataFrame:
     kolom = ["klaster", "nama", "jumlah", "persen", "kata_kunci", "kategori_dominan", "tahun_puncak",
              "label_salah_persen", "contoh"]
     # Tanpa satu pun artikel, DataFrame kosong tidak punya kolom "jumlah" dan sort_values melempar KeyError.
-    return pd.DataFrame(baris, columns=kolom).sort_values("jumlah", ascending=False).reset_index(drop=True)
+    # mergesort: topik berukuran sama tetap urut nomor klaster, tidak teracak tiap kali dihitung.
+    return (pd.DataFrame(baris, columns=kolom).sort_values("jumlah", ascending=False, kind="mergesort")
+            .reset_index(drop=True))
 
 
 # ----------------------------------------------------------------------------

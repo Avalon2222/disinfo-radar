@@ -296,3 +296,14 @@ def test_ringkasan_klaster_tanpa_artikel(df, model):
     hasil = analisis.ringkasan_klaster(kosong, palsu)
     assert hasil.empty
     assert "jumlah" in hasil.columns
+
+
+def test_ringkasan_klaster_ukuran_seri_urut_nomor():
+    k = 40
+    label = np.repeat(np.arange(k), [3 if i % 3 else 5 for i in range(k)])
+    df = pd.DataFrame({"kategori": "x", "tahun": 2024, "label_kelompok": "Salah", "judul_bersih": "a"},
+                      index=range(len(label)))
+    palsu = SimpleNamespace(label=label, k=k, nama={i: f"t{i}" for i in range(k)}, kata_kunci={i: [] for i in range(k)})
+    hasil = analisis.ringkasan_klaster(df, palsu)
+    for _, grup in hasil.groupby("jumlah"):
+        assert grup["klaster"].tolist() == sorted(grup["klaster"])
