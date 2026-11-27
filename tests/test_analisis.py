@@ -280,3 +280,9 @@ def test_kata_dikenali_tanpa_duplikat(model):
     dikenal = analisis.kata_dikenali(model, "vaksin covid vaksin chip vaksin")
     assert dikenal.count("vaksin") == 1
     assert dikenal == list(dict.fromkeys(dikenal))
+
+
+@pytest.mark.parametrize("n", [0, -2])
+def test_beri_nama_n_nol_atau_negatif(n):
+    kk = [("vaksin", 0.9), ("chip", 0.5), ("gempa", 0.3)]
+    assert analisis.beri_nama(kk, n=n) == "(tanpa kata kunci)"
