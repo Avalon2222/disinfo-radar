@@ -1,5 +1,7 @@
 """Uji mesin NLP (src/analisis.py) pada korpus kecil buatan: dua topik yang jelas terpisah."""
 
+from types import SimpleNamespace
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -286,3 +288,11 @@ def test_kata_dikenali_tanpa_duplikat(model):
 def test_beri_nama_n_nol_atau_negatif(n):
     kk = [("vaksin", 0.9), ("chip", 0.5), ("gempa", 0.3)]
     assert analisis.beri_nama(kk, n=n) == "(tanpa kata kunci)"
+
+
+def test_ringkasan_klaster_tanpa_artikel(df, model):
+    kosong = df.iloc[0:0]
+    palsu = SimpleNamespace(label=np.array([], dtype=int), k=model.k, nama=model.nama, kata_kunci=model.kata_kunci)
+    hasil = analisis.ringkasan_klaster(kosong, palsu)
+    assert hasil.empty
+    assert "jumlah" in hasil.columns

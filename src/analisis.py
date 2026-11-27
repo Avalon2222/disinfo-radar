@@ -184,7 +184,10 @@ def ringkasan_klaster(df: pd.DataFrame, model: ModelTopik) -> pd.DataFrame:
             "label_salah_persen": round(100 * (sub["label_kelompok"] == "Salah").mean(), 0),
             "contoh": sub["judul_bersih"].head(3).tolist(),
         })
-    return pd.DataFrame(baris).sort_values("jumlah", ascending=False).reset_index(drop=True)
+    kolom = ["klaster", "nama", "jumlah", "persen", "kata_kunci", "kategori_dominan", "tahun_puncak",
+             "label_salah_persen", "contoh"]
+    # Tanpa satu pun artikel, DataFrame kosong tidak punya kolom "jumlah" dan sort_values melempar KeyError.
+    return pd.DataFrame(baris, columns=kolom).sort_values("jumlah", ascending=False).reset_index(drop=True)
 
 
 # ----------------------------------------------------------------------------
