@@ -124,6 +124,10 @@ def beri_nama(kata_kunci: list[tuple[str, float]], n: int = 3) -> str:
     """Gabungkan kata kunci teratas yang tidak saling tumpang tindih: 'vaksin · covid · chip'."""
     terpilih: list[str] = []
     token_terpilih: set[str] = set()
+    # n <= 0 berarti tidak ada kata yang diminta; tanpa cek ini "len == n" tidak pernah tercapai
+    # dan seluruh kata kunci ikut tergabung.
+    if n <= 0:
+        return "(tanpa kata kunci)"
     for kata, _ in kata_kunci:
         # Bandingkan per kata utuh, bukan per huruf: "ri" tidak boleh dianggap bagian dari "polri".
         token = set(kata.split())
