@@ -107,7 +107,10 @@ def siapkan(df: pd.DataFrame) -> pd.DataFrame:
     # id pecahan (12.5) bukan nomor artikel; astype(int) memotongnya jadi 12 dan bisa menimpa artikel 12 asli.
     df["id"] = df["id"].where(df["id"] % 1 == 0)
     # Judul yang isinya spasi saja lolos dropna dan tampil sebagai kartu kosong; anggap tidak ada judul.
-    df["judul"] = df["judul"].map(lambda j: j if isinstance(j, str) and j.strip() else None)
+    # Spasi di tepi judul dan URL (dari suntingan manual) ikut tampil di kartu dan membuat tautan rusak.
+    df["judul"] = df["judul"].map(lambda j: j.strip() if isinstance(j, str) and j.strip() else None)
+    if "url" in df.columns:
+        df["url"] = df["url"].map(lambda u: u.strip() if isinstance(u, str) else u)
     df = df.dropna(subset=["id", "tanggal", "judul"]).copy()
     # Sebagian kecil artikel tampil dengan tanggal mustahil di situs (tahun 1000, 6325, atau di masa depan); dibuang.
     batas_akhir = pd.Timestamp.today().normalize() + pd.Timedelta(days=1)

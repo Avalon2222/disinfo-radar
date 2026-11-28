@@ -293,3 +293,12 @@ def test_urai_rss_item_tanpa_judul_dan_tautan_ganda_dibuang():
     df = muat_data.urai_rss(xml)
     assert df["id"].tolist() == [5, 7]
     assert df["judul"].tolist() == ["a", "b"]
+
+
+def test_siapkan_judul_dan_url_berspasi_dirapikan():
+    d = contoh_df()
+    d.loc[0, "judul"] = "  [SALAH] Video Vaksin Mengandung Chip  "
+    d.loc[0, "url"] = " https://turnbackhoax.id/articles/3 "
+    hasil = muat_data.siapkan(d).set_index("id")
+    assert hasil.loc[3, "judul"] == "[SALAH] Video Vaksin Mengandung Chip"
+    assert hasil.loc[3, "url"] == "https://turnbackhoax.id/articles/3"
