@@ -279,3 +279,17 @@ def test_siapkan_buang_judul_kosong():
         "label": ["SALAH"] * 2, "kategori": ["x"] * 2, "ringkasan": [""] * 2,
     })
     assert muat_data.siapkan(df)["id"].tolist() == [1]
+
+
+def test_urai_rss_item_tanpa_judul_dan_tautan_ganda_dibuang():
+    xml = (
+        "<rss><channel>"
+        "<item><title>a</title><link>https://x/articles/5</link><pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate></item>"
+        "<item><title>a (ulang)</title><link>https://x/articles/5</link><pubDate>Mon, 01 Jan 2024 01:00:00 +0000</pubDate></item>"
+        "<item><title>  </title><link>https://x/articles/6</link><pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate></item>"
+        "<item><title>b</title><link>https://x/articles/7</link><pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate></item>"
+        "</channel></rss>"
+    )
+    df = muat_data.urai_rss(xml)
+    assert df["id"].tolist() == [5, 7]
+    assert df["judul"].tolist() == ["a", "b"]
