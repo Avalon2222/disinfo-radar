@@ -181,7 +181,11 @@ def urai_rss(teks_xml: str) -> pd.DataFrame:
         })
     df = pd.DataFrame(baris, columns=["id", "tanggal", "judul", "url", "kategori"])
     df["tanggal"] = pd.to_datetime(df["tanggal"], errors="coerce")
-    return df
+    # Item tanpa judul tidak bisa dipetakan ke klaster, dan artikel yang muncul dua kali di feed
+    # (tautan sama) dulu tampil dua baris di tabel "Terbaru".
+    df = df[df["judul"] != ""]
+    df = df[(df["url"] == "") | ~df["url"].duplicated()]
+    return df.reset_index(drop=True)
 
 
 def ambil_rss(url: str = URL_RSS, timeout: int = 12) -> HasilRSS:
