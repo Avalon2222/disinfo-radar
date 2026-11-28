@@ -307,3 +307,14 @@ def test_ringkasan_klaster_ukuran_seri_urut_nomor():
     hasil = analisis.ringkasan_klaster(df, palsu)
     for _, grup in hasil.groupby("jumlah"):
         assert grup["klaster"].tolist() == sorted(grup["klaster"])
+
+
+def test_batas_berzona_waktu_disamakan_ke_wib(df):
+    batas_naif = pd.Timestamp("2022-01-01")
+    batas_utc = pd.Timestamp("2021-12-31 17:00", tz="UTC")   # = 2022-01-01 00:00 WIB
+    naik_turun = analisis.kata_naik_turun(df, batas_utc, min_total=1, n=50)
+    pembanding = analisis.kata_naik_turun(df, batas_naif, min_total=1, n=50)
+    pd.testing.assert_frame_equal(naik_turun, pembanding)
+    tren = analisis.tren_bulanan(df, "kategori", mulai=batas_utc)
+    pd.testing.assert_frame_equal(tren, analisis.tren_bulanan(df, "kategori", mulai=batas_naif))
+    assert len(tren) > 0

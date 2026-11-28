@@ -23,7 +23,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from src import teks
+from src import muat_data, teks
 
 
 # ----------------------------------------------------------------------------
@@ -195,9 +195,21 @@ def ringkasan_klaster(df: pd.DataFrame, model: ModelTopik) -> pd.DataFrame:
 # ----------------------------------------------------------------------------
 # 3. Tren waktu
 # ----------------------------------------------------------------------------
+def _batas_wib(batas) -> pd.Timestamp:
+    """Batas tanggal sebagai Timestamp WIB tanpa zona, sama seperti kolom `tanggal` arsip.
+
+    Batas berzona waktu (mis. datetime.now(timezone.utc)) dulu membuat perbandingan dengan kolom
+    tanggal yang tanpa zona melempar TypeError.
+    """
+    t = pd.Timestamp(batas)
+    if t.tzinfo is not None:
+        t = t.tz_convert(muat_data.WIB).tz_localize(None)
+    return t
+
+
 def tren_bulanan(df: pd.DataFrame, kolom: str, mulai: pd.Timestamp | None = None) -> pd.DataFrame:
     """Tabel bulan x nilai `kolom` berisi jumlah artikel. Bulan tanpa artikel diisi 0."""
-    d = df if mulai is None else df[df["tanggal"] >= mulai]
+    d = df if mulai is None else df[df["tanggal"] >= _batas_wib(mulai)]
     if d.empty:
         return pd.DataFrame()
     # pivot_table membuang baris yang nilai `kolom`-nya kosong; hitung sebagai "Tidak diketahui".
@@ -245,6 +257,7 @@ def kata_naik_turun(df: pd.DataFrame, batas: pd.Timestamp, min_total: int = 8, n
     Bandingkan seberapa sering sebuah kata muncul per 1.000 judul SEBELUM vs SESUDAH tanggal `batas`.
     rasio > 1 berarti kata itu makin ramai. Pemulusan +1 (Laplace) agar kata baru tidak memberi pembagian nol.
     """
+    batas = _batas_wib(batas)
     sebelum = df[df["tanggal"] < batas]["teks_tfidf"].dropna()
     sesudah = df[df["tanggal"] >= batas]["teks_tfidf"].dropna()
     if sebelum.empty or sesudah.empty:
